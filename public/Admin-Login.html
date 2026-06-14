@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<style>
+
+#popup{
+position:fixed;
+top:20px;
+right:20px;
+
+background:#0a8754;
+
+color:white;
+
+padding:12px 20px;
+
+border-radius:8px;
+
+display:none;
+
+z-index:9999;
+}
+</style>
+
+<head>
+<title>Admin Login</title>
+</head>
+<p>Only administrators can log in here.
+ If you are not a staff, please tap on Home and on the main
+  page click on login in order to request collection services.</p>
+<body>
+<div id="popup"></div>
+
+<h2>Admin Login</h2>
+
+<form id="adminLoginForm">
+
+<input id="adminUser" placeholder="Username" required>
+
+<input id="adminPass" type="password" placeholder="Password" required>
+
+<button type="submit">Login as Admin</button>
+
+</form>
+
+<nav> <a href="index.html" style = "text-align: right">Home</a></nav>
+
+
+<img src="imgAdmins.jfif" alt="Admin" style="width:400px;height:400px;">
+
+<img src="imgAdmins.jfif" alt="Admin" style="width:400px;height:400px;">
+
+<img src="imgAdmins.jfif" alt="Admin" style="width:400px;height:400px;">
+
+
+<script>
+
+    function popup(msg){
+
+const p =
+document.getElementById("popup");
+
+p.innerText =
+msg;
+
+p.style.display =
+"block";
+
+setTimeout(()=>{
+
+p.style.display =
+"none";
+
+},2500);
+
+}
+
+
+//
+
+const form =
+document.getElementById("adminLoginForm");
+
+const adminUser =
+document.getElementById("adminUser");
+
+const adminPass =
+document.getElementById("adminPass");
+
+
+form.addEventListener("submit", async (e) => {
+
+e.preventDefault();
+
+
+try {
+
+const res = await fetch(
+"http://localhost:3000/api/admin/login",
+{
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+username: adminUser.value.trim(),
+password: adminPass.value
+})
+}
+);
+
+
+const data = await res.json();
+
+
+if (!res.ok) {
+alert(data.message || "Login failed");
+return;
+}
+
+
+// store admin safely
+localStorage.setItem(
+"admin",
+JSON.stringify(data.admin)
+);
+
+alert("Admin login successful");
+
+window.location.href = "Admin-Dashboard.html";
+
+} catch (err) {
+
+console.error(err);
+
+alert("Server not reachable");
+
+}
+
+});
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<img src="Truck.jfif" alt="Logo" style="width:200px;height:150px;">
+<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
+<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
+<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
+<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
+<img src="Truck.jfif" alt="Logo" style="width:200px;height:150px;">
+
+<meta charset="UTF-8">
+<title>Admin Dashboard - Waste Requests</title>
+
+<div class="page-description">
+
+<p>Welcome to the Waste Collection Administration Dashboard.
+     This platform enables you to monitor and manage
+      waste collection requests submitted by users.</p>
+
+<p>Review incoming requests, approve or reject submissions, assign collection trucks,
+ and track request progress to support efficient waste management operations.</p>
+
+<p>Use the actions provided in the request table
+     to coordinate collection activities and maintain service delivery standards. </p>
+
+</div>
+
+<style>
+
+body{
+font-family:Arial;
+padding:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:12px;
+border:1px solid #ddd;
+text-align:left;
+}
+
+th{
+background:#0b8457;
+color:white;
+}
+
+button{
+padding:6px 10px;
+margin-right:5px;
+cursor:pointer;
+}
+
+.approve{
+background:#28a745;
+color:white;
+border:none;
+}
+
+.assign{
+background:#007bff;
+color:white;
+border:none;
+}
+
+
+</style>
+
+</head>
+
+<body>
+<nav>
+    <A href="index.html" style = "text-align: right">Home</A>
+</nav>
+<h2>Waste Collection Requests</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Phone</th>
+<th>Location</th>
+<th>Waste Type</th>
+<th>Status</th>
+<th>Truck Number</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="requestTable">
+
+<tr>
+<td colspan="8">Loading requests...</td>
+</tr>
+
+</tbody>
+
+</table>
+
+<script>
+
+// =====================
+// LOAD REQUESTS
+// =====================
+async function loadRequests(){
+
+try{
+
+const response =
+await fetch("http://localhost:3000/api/requests");
+
+const requests =
+await response.json();
+
+const table =
+document.getElementById("requestTable");
+
+table.innerHTML="";
+
+requests.forEach(r=>{
+
+table.innerHTML += `
+<tr>
+
+<td>${r.id}</td>
+<td>${r.name}</td>
+<td>${r.phone || "-"}</td>
+<td>${r.location}</td>
+<td>${r.wasteType}</td>
+<td>${r.status}</td>
+<td>${r.assigned_truck || "-"}</td>
+
+<td>
+
+<button class="approve"
+onclick="approveRequest(${r.id})">
+Approve
+</button>
+
+<button class="assign"
+onclick="assignTruck(${r.id})">
+Assign Truck
+</button>
+
+</td>
+
+</tr>
+`;
+
+});
+
+}
+catch(err){
+console.log(err);
+}
+
+}
+
+// =====================
+// APPROVE REQUEST
+// =====================
+async function approveRequest(id){
+
+await fetch(
+`http://localhost:3000/api/requests/approve/${id}`,
+{
+method:"PUT"
+}
+);
+
+loadRequests();
+
+}
+
+// =====================
+// ASSIGN TRUCK
+// =====================
+async function assignTruck(id){
+
+const truck =
+prompt("Enter truck name / plate:");
+
+if(!truck) return;
+
+await fetch(
+`http://localhost:3000/api/requests/assign/${id}`,
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({ truck })
+}
+);
+
+loadRequests();
+
+}
+
+// =====================
+// INIT
+// =====================
+window.onload = loadRequests;
+
+</script>
+
+</body>
+
+</html>
