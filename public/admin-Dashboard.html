@@ -113,7 +113,7 @@ async function loadRequests(){
 try{
 
 const response =
-await fetch("http://localhost:3000/api/requests");
+await fetch("/api/requests");
 
 const requests =
 await response.json();
