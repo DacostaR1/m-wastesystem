@@ -60,12 +60,14 @@ app.post("/api/auth", async (req, res) => {
     }
 
     db.query(
-      "SELECT * FROM Requesters WHERE email = ?",
+      "SELECT * FROM requesters WHERE email = ?",
       [email],
       async (err, rows) => {
         if (err) {
           console.log(err);
-          return res.status(500).json({ message: "Database error" });
+          return res.status(500).json({
+  message: err.message
+});
         }
 
         // LOGIN
@@ -92,7 +94,7 @@ app.post("/api/auth", async (req, res) => {
         const hash = await bcrypt.hash(password, 10);
 
         db.query(
-          "INSERT INTO Requesters (full_name, email, password_hash) VALUES (?, ?, ?)",
+          "INSERT INTO requesters (full_name, email, password_hash) VALUES (?, ?, ?)",
           [fullName, email, hash],
           (err, result) => {
             if (err) {
