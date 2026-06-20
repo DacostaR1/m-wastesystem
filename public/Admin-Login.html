@@ -151,7 +151,7 @@ e.preventDefault();
 
 try {
 
-const res = await fetch("http://localhost:3000/api/admin/login", {
+const res = await fetch("/api/admin/login", {
 method: "POST",
 headers: {"Content-Type": "application/json"},
 body: JSON.stringify({
@@ -172,7 +172,7 @@ localStorage.setItem("admin", JSON.stringify(data.admin));
 popup("Login successful");
 
 setTimeout(() => {
-window.location.href = "Admin-Dashboard.html";
+window.location.href = "admin-Dashboard.html";
 }, 1500);
 
 } catch (err) {
