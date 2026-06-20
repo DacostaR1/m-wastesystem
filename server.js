@@ -1,61 +1,55 @@
-
-
 require("dotenv").config();
 
-const bcrypt = require("bcrypt");
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
+const path = require("path");
+
+
+
+
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 10000; //Default port for Render.(Dynamic port for Render)
 
-// =====================
-// MIDDLEWARE
-// =====================
+// middleware FIRST
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+app.use(express.static(path.join(__dirname, "public")));
 
 
-// =====================
-// MYSQL CONNECTION
-// =====================
-const db = mysql.createConnection({
 
-host:
-process.env.DB_HOST,
-
-user:
-process.env.DB_USER,
-
-password:
-process.env.DB_PASSWORD,
-
-database:
-process.env.DB_NAME
-
+// Homepage route to run the page public other than the local host.
+app.get("/", (req, res) => {
+res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-db.connect((err) => {
 
+
+// MYSQL CONNECTION
+
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT  4000,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+db.connect((err) => {
   if (err) {
-    console.log(
-      "Database connection failed:",
-      err
-    );
+    console.log("Database not connected (app will still run):", err.message);
     return;
   }
-
-  console.log(
-    " MySQL Database has Connected succe"
-  );
-
+  console.log("MySQL Database has been connected Successfully");
 });
 
+// REGISTER + LOGIN Page
 
 
-// =====================
-// REGISTER + LOGIN
-// =====================
 
 app.post(
 
