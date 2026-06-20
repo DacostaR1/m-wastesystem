@@ -165,7 +165,7 @@ app.post("/api/requests", (req, res) => {
     email,
     wasteType,
     additionalInfo
-  } = req.body; // ✅ FIXED (removed stray "s")
+  } = req.body; 
 
   if (!name || !location || !phone || !email || !wasteType) {
     return res.status(400).json({ message: "Required fields missing" });

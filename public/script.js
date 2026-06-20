@@ -1,65 +1,44 @@
-
-let requests =
-JSON.parse(
-localStorage.getItem("requests")
-) || [];
-
-
+let requests = [];
 
 function popup(msg){
-
-const p =
-document.getElementById("popup");
+const p = document.getElementById("popup");
 
 if(!p) return;
 
 p.innerText = msg;
-
 p.style.display = "block";
 
 setTimeout(()=>{
-
-p.style.display =
-"none";
-
+p.style.display = "none";
 },2500);
-
 }
 
-
-
-
+// ======================
+// RENDER REQUEST TABLE
+// ======================
 function render(){
 
 const table =
-document.getElementById(
-"requestTable"
-);
+document.getElementById("requestTable");
 
 if(!table) return;
 
-table.innerHTML="";
+table.innerHTML = "";
 
 if(requests.length===0){
 
 table.innerHTML=`
 
 <tr>
-
 <td colspan="4">
-
 No requests submitted
-
 </td>
-
 </tr>
-
 `;
 
 return;
 
 }
-
 
 requests.forEach(r=>{
 
@@ -73,82 +52,41 @@ table.innerHTML += `
 
 <td>${r.phone}</td>
 
-<td
-class="status-${(
-r.status ||
-"pending"
-).toLowerCase()}">
-
-${r.status}
-
+<td class="status-${(r.status || "pending").toLowerCase()}">
+${r.status || "Pending"}
 </td>
 
 </tr>
-
 `;
 
 });
 
-
-localStorage.setItem(
-
-"requests",
-
-JSON.stringify(
-requests
-)
-
-);
-
 }
 
-
-
-
+// ======================
+// SHOW USER AREA
+// ======================
 function unlockForm(){
 
 const user =
-
 JSON.parse(
-
-localStorage
-.getItem(
-"user"
-)
-
+localStorage.getItem("user")
 );
-
 
 if(user){
 
 document
-
-.getElementById(
-"request"
-)
-
+.getElementById("request")
 ?.classList
-
-.remove(
-"hidden"
-);
-
+.remove("hidden");
 
 const logged =
-
-document
-
-.getElementById(
-"loggedUser"
-);
-
+document.getElementById("loggedUser");
 
 if(logged){
 
 logged.innerHTML =
-
-`Logged in:
-${user.name}`;
+`Logged in: ${user.name}`;
 
 }
 
@@ -156,14 +94,12 @@ ${user.name}`;
 
 }
 
-
-
+// ======================
+// LOGIN / REGISTER
+// ======================
 document
-.getElementById(
-"loginForm"
-)
+.getElementById("loginForm")
 ?.addEventListener(
-
 "submit",
 
 async function(e){
@@ -173,55 +109,121 @@ e.preventDefault();
 try{
 
 const response =
-
 await fetch(
-
-"http://localhost:3000/api/auth",
-
+"/api/auth",
 {
-
 method:"POST",
 
 headers:{
-"Content-Type":
-"application/json"
+"Content-Type":"application/json"
 },
 
-body:
-
-JSON.stringify({
+body:JSON.stringify({
 
 fullName:
-
-document
-.getElementById(
-"userName"
-).value,
+document.getElementById("userName").value,
 
 email:
-
-document
-.getElementById(
-"userEmail"
-).value,
+document.getElementById("userEmail").value,
 
 password:
-
-document
-.getElementById(
-"userPassword"
-).value
+document.getElementById("userPassword").value
 
 })
 
 }
-
 );
-
 
 const result =
 await response.json();
 
+if(!response.ok){
+
+popup(result.message);
+
+return;
+
+}
+
+localStorage.setItem(
+"user",
+JSON.stringify(result.user)
+);
+
+unlockForm();
+
+popup(result.message);
+
+this.reset();
+
+}
+catch(err){
+
+console.log(err);
+
+popup(
+"Server unavailable"
+);
+
+}
+
+}
+);
+
+// ======================
+// SUBMIT REQUEST
+// ======================
+document
+.getElementById("wasteForm")
+?.addEventListener(
+"submit",
+
+async function(e){
+
+e.preventDefault();
+
+const data = {
+
+name:
+document.getElementById("fullName").value,
+
+location:
+document.getElementById("location").value,
+
+phone:
+document.getElementById("phone").value,
+
+email:
+document.getElementById("email").value,
+
+wasteType:
+document.getElementById("wasteType").value,
+
+additionalInfo:
+document.getElementById("additionalInfo").value
+
+};
+
+try{
+
+const response =
+await fetch(
+"/api/requests",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:
+JSON.stringify(data)
+
+}
+);
+
+const result =
+await response.json();
 
 if(!response.ok){
 
@@ -233,249 +235,49 @@ return;
 
 }
 
+requests.unshift({
 
-localStorage.setItem(
+...data,
+status:"Pending"
 
-"user",
+});
 
-JSON.stringify(
-result.user
-)
-
-);
-
-unlockForm();
-
-popup(
-result.message
-);
+render();
 
 this.reset();
 
-}
+popup(
+"Request submitted successfully"
+);
 
+}
 catch(err){
 
 console.log(err);
 
 popup(
-"Server unavailable"
-);
-
-}
-
-});
-
-
-
-document
-
-.getElementById(
-"wasteForm"
-)
-
-?.addEventListener(
-
-"submit",
-
-async function(e){
-
-e.preventDefault();
-
-
-const data={
-
-name:
-
-document
-.getElementById(
-"fullName"
-).value,
-
-
-location:
-
-document
-.getElementById(
-"location"
-).value,
-
-
-phone:
-
-document
-.getElementById(
-"phone"
-).value,
-
-
-email:
-
-document
-.getElementById(
-"email"
-).value,
-
-
-wasteType:
-
-document
-.getElementById(
-"wasteType"
-).value,
-
-
-additionalInfo:
-
-document
-.getElementById(
-"additionalInfo"
-).value,
-
-
-date:
-
-new Date()
-.toLocaleDateString(),
-
-
-status:
-"Pending"
-
-};
-
-
-try{
-
-const response =
-
-await fetch(
-
-"http://localhost:3000/api/requests",
-
-{
-
-method:
-"POST",
-
-headers:{
-
-"Content-Type":
-"application/json"
-
-},
-
-body:
-
-JSON.stringify(
-data
-)
-
-}
-
-);
-
-
-if(!response.ok){
-
-throw new Error(
-"Submit failed"
-);
-
-}
-
-
-requests.unshift(
-data
-);
-
-render();
-
-this.reset();
-
-
-popup(
-"Request submitted"
-);
-
-}
-
-catch(err){
-
-console.error(
-err
-);
-
-
-popup(
-
 "Server connection failed"
-
 );
 
 }
 
 }
-
 );
 
+// ======================
+// LOGOUT
+// ======================
+function logout(){
 
+localStorage.removeItem("user");
+
+localStorage.removeItem("admin");
+
+window.location.href =
+"index.html";
+
+}
 
 unlockForm();
 
 render();
-
-
-//Admin Dashboard
-app.get("/api/admin/requests", (req,res)=>{
-
-db.query(
-"SELECT * FROM requests ORDER BY id DESC",
-(err,rows)=>{
-
-if(err)
-return res.status(500).json(err);
-
-res.json(rows);
-
-});
-
-});
-
-
-
-//Admin Actions
-
-app.put("/api/admin/requests/:id", (req,res)=>{
-
-const {status, truck, admin} = req.body;
-
-db.query(
-`
-UPDATE requests
-SET status=?,
-assigned_truck=?,
-approved_by=?
-WHERE id=?
-`,
-[status, truck, admin, req.params.id],
-
-(err)=>{
-
-if(err)
-return res.status(500).json(err);
-
-res.json({message:"Request updated"});
-
-}
-
-);
-
-});
-
-//Logout function
-function logout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("admin");
-    window.location.href = "index.html";
-}
