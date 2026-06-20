@@ -1,139 +1,182 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+
 <style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0a8754, #0f5f3c);
+}
 
-#popup{
-position:fixed;
-top:20px;
-right:20px;
 
-background:#0a8754;
+#popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ffffff;
+    color: #0a8754;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: none;
+    z-index: 9999;
+    font-weight: bold;
+}
 
-color:white;
 
-padding:12px 20px;
+.container {
+    width: 100%;
+    max-width: 420px;
+    margin: 70px auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    backdrop-filter: blur(6px);
+}
 
-border-radius:8px;
 
-display:none;
+h2 {
+    text-align: center;
+    color: #0a8754;
+}
 
-z-index:9999;
+.info {
+    font-size: 14px;
+    background: #e6f7ee;
+    padding: 10px;
+    border-left: 4px solid #0a8754;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    color: #2d2d2d;
+}
+
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #0a8754;
+    box-shadow: 0 0 5px rgba(10,135,84,0.4);
+}
+
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #0a8754;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #076b42;
+}
+
+
+nav {
+    text-align: center;
+    margin-top: 12px;
+}
+
+nav a {
+    color: #0a8754;
+    text-decoration: none;
+    font-weight: bold;
 }
 </style>
 
-<head>
-<title>Admin Login</title>
 </head>
-<p>Only administrators can log in here.
- If you are not a staff, please tap on Home and on the main
-  page click on login in order to request collection services.</p>
+
 <body>
+
 <div id="popup"></div>
+
+<div class="container">
 
 <h2>Admin Login</h2>
 
+<p class="info">
+Only administrators can log in here. If you are not a staff, 
+Kindly go to Home Page and login from the main page to request for waste collection services.
+</p>
+
 <form id="adminLoginForm">
 
-<input id="adminUser" placeholder="Username" required>
+<label>Username</label> 
+<input id="adminUser" type="text" required>
 
-<input id="adminPass" type="password" placeholder="Password" required>
+<label>Password</label>
+ <input id="adminPass" type="password" required>
 
 <button type="submit">Login as Admin</button>
 
 </form>
 
-<nav> <a href="index.html" style = "text-align: right">Home</a></nav>
+<nav>
+<a href="index.html">Home</a>
+</nav>
 
-
-<img src="imgAdmins.jfif" alt="Admin" style="width:400px;height:400px;">
-
-<img src="imgAdmins.jfif" alt="Admin" style="width:400px;height:400px;">
-
-<img src="imgAdmins.jfif" alt="Admin" style="width:400px;height:400px;">
-
+</div>
 
 <script>
 
-    function popup(msg){
-
-const p =
-document.getElementById("popup");
-
-p.innerText =
-msg;
-
-p.style.display =
-"block";
-
-setTimeout(()=>{
-
-p.style.display =
-"none";
-
-},2500);
-
+function popup(msg){
+const p = document.getElementById("popup");
+p.innerText = msg;
+p.style.display = "block";
+setTimeout(()=> p.style.display="none", 2500);
 }
 
-
-//
-
-const form =
-document.getElementById("adminLoginForm");
-
-const adminUser =
-document.getElementById("adminUser");
-
-const adminPass =
-document.getElementById("adminPass");
-
+const form = document.getElementById("adminLoginForm");
+const adminUser = document.getElementById("adminUser");
+const adminPass = document.getElementById("adminPass");
 
 form.addEventListener("submit", async (e) => {
-
 e.preventDefault();
-
 
 try {
 
-const res = await fetch(
-"http://localhost:3000/api/admin/login",
-{
+const res = await fetch("http://localhost:3000/api/admin/login", {
 method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
+headers: {"Content-Type": "application/json"},
 body: JSON.stringify({
 username: adminUser.value.trim(),
 password: adminPass.value
 })
-}
-);
-
+});
 
 const data = await res.json();
 
-
 if (!res.ok) {
-alert(data.message || "Login failed");
+popup(data.message || "Login failed");
 return;
 }
 
+localStorage.setItem("admin", JSON.stringify(data.admin));
 
-// store admin safely
-localStorage.setItem(
-"admin",
-JSON.stringify(data.admin)
-);
+popup("Login successful");
 
-alert("Admin login successful");
-
+setTimeout(() => {
 window.location.href = "Admin-Dashboard.html";
+}, 1500);
 
 } catch (err) {
-
-console.error(err);
-
-alert("Server not reachable");
-
+popup("Server not reachable");
 }
 
 });
@@ -141,5 +184,4 @@ alert("Server not reachable");
 </script>
 
 </body>
-
 </html>
