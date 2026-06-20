@@ -45,14 +45,14 @@ const db = mysql.createConnection({
 db.connect((err) => {
   if (err) {
     console.log(
-      "Database not connected (app will still run):",
+      "Database not connected:",
       err.message
     );
     return;
   }
 
   console.log(
-    "MySQL Database has been connected Successfully"
+    "MySQL Database has connected Successfully"
   );
 });
 
@@ -60,227 +60,89 @@ db.connect((err) => {
 
 
 
-app.post(
-
-"/api/auth",
-
-async(req,res)=>{
-
-try{
-
-const {
-
-fullName,
-
-email,
-
-password
-
-}=req.body;
-
-
-
-if(
-!fullName ||
-!email ||
-!password
-){
-
-return res
-.status(400)
-.json({
-
-message:
-"All fields required"
-
-});
-
-}
-
-
-
-db.query(
-
-`
-SELECT *
-FROM Requesters
-WHERE email=?
-`,
-
-[email],
-
-async(err,rows)=>{
-
-if(err){
-
-console.log(err);
-
-return res
-.status(500)
-.json({
-
-message:
-"Database error"
-
-});
-
-}
-
-
-
-// LOGIN EXISTING USER
-
-if(rows.length>0){
-
-const user =
-rows[0];
-
-
-const ok =
-
-await bcrypt.compare(
-
-password,
-
-user.password_hash
-
-);
-
-
-if(!ok){
-
-return res
-.status(401)
-.json({
-
-message:
-"You have entered an Invalid password, Please try again "
-
-});
-
-}
-
-
-return res.json({
-
-message:
-"You have successfully Logged in",
-
-user:{
-
-id:
-user.id,
-
-name:
-user.full_name,
-
-email:
-user.email
-
-}
-
-});
-
-}
-
-
-
-// REGISTER FIRST TIME USER
-
-const hash =
-
-await bcrypt.hash(
-password,
-10
-);
-
-
-db.query(
-
-`
-INSERT INTO Requesters
-(
-full_name,
-email,
-password_hash
-)
-
-VALUES
-(
-?,
-?,
-?
-)
-`,
-
-[
-fullName,
-email,
-hash
-],
-
-(err,result)=>{
-
-if(err){
-
-console.log(err);
-
-return res
-.status(500)
-.json({
-
-message:
-"Account creation failed"
-
-});
-
-}
-
-
-res.json({
-
-message:
-"Account created",
-
-user:{
-
-id:
-result.insertId,
-
-name:
-fullName,
-
-email
-
-}
-
-});
-
-}
-
-);
-
-}
-
-);
-
-}
-
-catch(err){
-
-console.log(err);
-
-res
-.status(500)
-.json({
-
-message:
-"Server error"
-
-});
-
-}
-
+app.post("/api/auth", async (req, res) => {
+  try {
+    const { fullName, email, password } = req.body;
+
+    if (!fullName || !email || !password) {
+      return res.status(400).json({
+        message: "All fields required"
+      });
+    }
+
+    db.query(
+      `SELECT * FROM Requesters WHERE email = ?`,
+      [email],
+      async (err, rows) => {
+
+        if (err) {
+          console.log("DB ERROR:", err);
+          return res.status(500).json({
+            message: "Database error"
+          });
+        }
+
+        // =====================
+        // LOGIN EXISTING USER
+        // =====================
+        if (rows.length > 0) {
+          const user = rows[0];
+
+          const ok = await bcrypt.compare(password, user.password_hash);
+
+          if (!ok) {
+            return res.status(401).json({
+              message: "You have entered an invalid password, please try again"
+            });
+          }
+
+          return res.json({
+            message: "Login successful",
+            user: {
+              id: user.id,
+              name: user.full_name,
+              email: user.email
+            }
+          });
+        }
+
+        // =====================
+        // REGISTER NEW USER
+        // =====================
+        const hash = await bcrypt.hash(password, 10);
+
+        db.query(
+          `INSERT INTO Requesters (full_name, email, password_hash)
+           VALUES (?, ?, ?)`,
+          [fullName, email, hash],
+          (err, result) => {
+
+            if (err) {
+              console.log("INSERT ERROR:", err);
+              return res.status(500).json({
+                message: "Account creation failed"
+              });
+            }
+
+            return res.json({
+              message: "Account created",
+              user: {
+                id: result.insertId,
+                name: fullName,
+                email
+              }
+            });
+          }
+        );
+      }
+    );
+
+  } catch (err) {
+    console.log("SERVER ERROR:", err);
+    res.status(500).json({
+      message: "Server error"
+    });
+  }
 });
 
 
@@ -334,7 +196,8 @@ phone,
 email,
 wasteType,
 additionalInfo
-} = req.body;
+} = req.body;s
+
 
 // VALIDATION
 if(!name || !location || !phone || !email || !wasteType){
@@ -343,36 +206,34 @@ message:"Required fields missing"
 });
 }
 
+
 const sql = `
 INSERT INTO requests
 (name, location, phone, email, wasteType, additionalInfo, status)
-VALUES (?,?,?,?,?,?,?)
+VALUES (?, ?, ?, ?, ?, ?, ?)
 `;
 
-db.query(sql,[
-name,
-location,
-phone,
-email, 
-wasteType,
-additionalInfo || null,
-"Pending"
-],(err,result)=>{
+db.query(sql, [
+  name,
+  location,
+  phone,
+  email,
+  wasteType,
+  additionalInfo || "",
+  "Pending"
+], (err, result) => {
 
-if(err){
-console.log(err);
-return res.status(500).json({
-message:"Insert failed"
-});
-}
+  if (err) {
+    console.log("INSERT ERROR:", err.sqlMessage || err);
+    return res.status(500).json({
+      message: "Insert failed"
+    });
+  }
 
-res.json({
-message:"Request saved",
-id: result.insertId
-});
-
-});
-
+  res.json({
+    message: "Request for waste collection has been sent successfully",
+    id: result.insertId
+  });
 });
 
 
@@ -380,54 +241,47 @@ id: result.insertId
 // GET ALL REQUESTS
 // =====================
 
-app.get("/api/requests", (req,res)=>{
+app.get("/api/requests", (req, res) => {
 
-const email = req.query.email;
+  const email = req.query.email;
 
-// USER VIEW
-if(email){
+  // =====================
+  // USER VIEW
+  // =====================
+  if (email) {
 
-db.query(
-`
-SELECT *
-FROM requests
-WHERE email=?
-ORDER BY id DESC
-`,
-[email],
+    db.query(
+      `SELECT * FROM requests WHERE email = ? ORDER BY id DESC`,
+      [email],
+      (err, rows) => {
 
-(err,rows)=>{
+        if (err) {
+          console.log("GET USER REQUESTS ERROR:", err);
+          return res.status(500).json([]);
+        }
 
-if(err){
-return res.status(500).json([]);
-}
+        res.json(rows);
+      }
+    );
 
-res.json(rows);
+    return;
+  }
 
-});
+  // =====================
+  // ADMIN VIEW
+  // =====================
+  db.query(
+    `SELECT * FROM requests ORDER BY id DESC`,
+    (err, rows) => {
 
-return;
+      if (err) {
+        console.log("GET ADMIN REQUESTS ERROR:", err);
+        return res.status(500).json([]);
+      }
 
-}
-
-
-// ADMIN VIEW
-db.query(
-`
-SELECT *
-FROM requests
-ORDER BY id DESC
-`,
-
-(err,rows)=>{
-
-if(err){
-return res.status(500).json([]);
-}
-
-res.json(rows);
-
-});
+      res.json(rows);
+    }
+  );
 
 });
 
@@ -557,7 +411,7 @@ port,
 () => {
 
 console.log(
-`🚀 Server running on http://localhost:${port}`
+`Server running on ${port}`
 );
 
 }
