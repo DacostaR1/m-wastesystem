@@ -26,6 +26,7 @@ res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 
+
 // MYSQL CONNECTION
 
 const db = mysql.createConnection({
@@ -33,18 +34,26 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT  4000,
+  port: Number(process.env.DB_PORT) || 4000,
+
   ssl: {
+    minVersion: "TLSv1.2",
     rejectUnauthorized: false
   }
 });
 
 db.connect((err) => {
   if (err) {
-    console.log("Database not connected (app will still run):", err.message);
+    console.log(
+      "Database not connected (app will still run):",
+      err.message
+    );
     return;
   }
-  console.log("MySQL Database has been connected Successfully");
+
+  console.log(
+    "MySQL Database has been connected Successfully"
+  );
 });
 
 // REGISTER + LOGIN Page
@@ -145,7 +154,7 @@ return res
 .json({
 
 message:
-"Invalid password"
+"You have entered an Invalid password, Please try again "
 
 });
 
@@ -155,7 +164,7 @@ message:
 return res.json({
 
 message:
-"Login successful",
+"You have successfully Logged in",
 
 user:{
 
