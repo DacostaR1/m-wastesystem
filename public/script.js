@@ -1,460 +1,140 @@
-// ======================
-// CONFIG
-// ======================
-
-// SAME DOMAIN (Render serves frontend + backend)
-const API_BASE = window.location.origin;
-
-// If frontend/backend separated use:
-// const API_BASE = "https://YOUR-APP.onrender.com";
+const API_BASE = "https://m-wastesystem-1.onrender.com";
 
 let requests = [];
-
 
 // ======================
 // POPUP
 // ======================
 function popup(msg){
-
-const p =
-document.getElementById("popup");
-
+const p = document.getElementById("popup");
 if(!p) return;
 
 p.innerText = msg;
-
-p.style.display =
-"block";
+p.style.display = "block";
 
 setTimeout(()=>{
-
-p.style.display =
-"none";
-
+p.style.display = "none";
 },2500);
-
 }
-
 
 // ======================
 // LOAD REQUESTS
 // ======================
 async function loadRequestsFromDB(){
-
 try{
+const res = await fetch(`${API_BASE}/api/requests`);
+if(!res.ok) throw new Error("Failed");
 
-const res =
-await fetch(
-`${API_BASE}/api/requests`
-);
-
-if(!res.ok){
-
-throw new Error(
-"Failed to fetch"
-);
-
-}
-
-requests =
-await res.json();
-
+requests = await res.json();
 render();
-
 }catch(err){
-
-console.log(
-"LOAD ERROR:",
-err
-);
-
-popup(
-"Failed to load requests"
-);
-
+console.log(err);
+popup("Failed to load requests");
 }
-
 }
-
 
 // ======================
-// RENDER TABLE
+// RENDER
 // ======================
 function render(){
-
-const table =
-document.getElementById(
-"requestTable"
-);
-
+const table = document.getElementById("requestTable");
 if(!table) return;
 
 table.innerHTML = "";
 
-if(
-!requests ||
-requests.length===0
-){
-
-table.innerHTML=`
-<tr>
-<td colspan="4">
-No requests submitted
-</td>
-</tr>
-`;
-
+if(requests.length === 0){
+table.innerHTML = `<tr><td colspan="4">No requests submitted</td></tr>`;
 return;
-
 }
 
 requests.forEach(r=>{
-
 table.innerHTML += `
-
 <tr>
-
-<td>
-${r.name || "-"}
-</td>
-
-<td>
-${r.location || "-"}
-</td>
-
-<td>
-${r.phone || "-"}
-</td>
-
-<td class="
-status-${
-(r.status || "pending")
-.toLowerCase()
-}
-">
-
+<td>${r.name}</td>
+<td>${r.location}</td>
+<td>${r.phone}</td>
+<td class="status-${(r.status || "pending").toLowerCase()}">
 ${r.status || "Pending"}
-
 </td>
-
 </tr>
-
 `;
-
 });
-
 }
 
-
 // ======================
-// SHOW REQUEST FORM
+// LOGIN
 // ======================
-function unlockForm(){
-
-const user =
-JSON.parse(
-localStorage.getItem(
-"user"
-)
-);
-
-if(!user) return;
-
-document
-.getElementById(
-"request"
-)
-?.classList
-.remove(
-"hidden"
-);
-
-const logged =
-document
-.getElementById(
-"loggedUser"
-);
-
-if(logged){
-
-logged.innerHTML=
-`Logged in as:
-${user.name}`;
-
-}
-
-}
-
-
-// ======================
-// LOGIN / REGISTER
-// ======================
-document
-.getElementById(
-"loginForm"
-)
-?.addEventListener(
-"submit",
-
-async function(e){
-
+document.getElementById("loginForm")?.addEventListener("submit", async (e)=>{
 e.preventDefault();
 
 try{
-
-const payload = {
-
-fullName:
-document
-.getElementById(
-"userName"
-)
-.value
-.trim(),
-
-email:
-document
-.getElementById(
-"userEmail"
-)
-.value
-.trim(),
-
-password:
-document
-.getElementById(
-"userPassword"
-)
-.value
-
-};
-
-const response =
-await fetch(
-`${API_BASE}/api/auth`,
-{
+const response = await fetch(`${API_BASE}/api/auth`,{
 method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:
-JSON.stringify(
-payload
-)
-}
-);
-
-const result =
-await response.json();
-
-console.log(
-result
-);
-
-if(
-!response.ok
-){
-
-popup(
-result.message ||
-"Login failed"
-);
-
-return;
-
-}
-
-localStorage.setItem(
-"user",
-JSON.stringify(
-result.user
-)
-);
-
-popup(
-result.message
-);
-
-unlockForm();
-
-this.reset();
-
-await loadRequestsFromDB();
-
-}catch(err){
-
-console.log(
-"LOGIN ERROR",
-err
-);
-
-popup(
-"Server unavailable"
-);
-
-}
-
+headers:{ "Content-Type":"application/json" },
+body: JSON.stringify({
+fullName: document.getElementById("userName").value,
+email: document.getElementById("userEmail").value,
+password: document.getElementById("userPassword").value
+})
 });
 
+const result = await response.json();
+
+if(!response.ok){
+popup(result.message || "Login failed");
+return;
+}
+
+localStorage.setItem("user", JSON.stringify(result.user));
+popup("Login successful");
+
+loadRequestsFromDB();
+}catch(err){
+console.log(err);
+popup("Server unavailable");
+}
+});
 
 // ======================
 // SUBMIT REQUEST
 // ======================
-document
-.getElementById(
-"wasteForm"
-)
-?.addEventListener(
-"submit",
-
-async function(e){
-
+document.getElementById("wasteForm")?.addEventListener("submit", async (e)=>{
 e.preventDefault();
 
 try{
-
-const data={
-
-name:
-document
-.getElementById(
-"fullName"
-)
-.value
-.trim(),
-
-location:
-document
-.getElementById(
-"location"
-)
-.value
-.trim(),
-
-phone:
-document
-.getElementById(
-"phone"
-)
-.value
-.trim(),
-
-email:
-document
-.getElementById(
-"email"
-)
-.value
-.trim(),
-
-wasteType:
-document
-.getElementById(
-"wasteType"
-)
-.value,
-
-additionalInfo:
-document
-.getElementById(
-"additionalInfo"
-)
-.value
-.trim()
-
+const data = {
+name: document.getElementById("fullName").value,
+location: document.getElementById("location").value,
+phone: document.getElementById("phone").value,
+email: document.getElementById("email").value,
+wasteType: document.getElementById("wasteType").value,
+additionalInfo: document.getElementById("additionalInfo").value
 };
 
-const response =
-await fetch(
-`${API_BASE}/api/requests`,
-{
+const response = await fetch(`${API_BASE}/api/requests`,{
 method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:
-JSON.stringify(
-data
-)
-
-}
-);
-
-const result =
-await response.json();
-
-if(
-!response.ok
-){
-
-popup(
-result.message ||
-"Submission failed"
-);
-
-return;
-
-}
-
-popup(
-"Request submitted successfully"
-);
-
-this.reset();
-
-await loadRequestsFromDB();
-
-}catch(err){
-
-console.log(
-"REQUEST ERROR",
-err
-);
-
-popup(
-"Server connection failed"
-);
-
-}
-
+headers:{ "Content-Type":"application/json" },
+body: JSON.stringify(data)
 });
 
+const result = await response.json();
 
-// ======================
-// LOGOUT
-// ======================
-function logout(){
-
-localStorage.removeItem(
-"user"
-);
-
-localStorage.removeItem(
-"admin"
-);
-
-window.location.href =
-"/";
-
+if(!response.ok){
+popup(result.message || "Failed");
+return;
 }
 
-
-// ======================
-// START
-// ======================
-window.addEventListener(
-"load",
-()=>{
-
-unlockForm();
-
+popup("Request submitted");
 loadRequestsFromDB();
+e.target.reset();
 
+}catch(err){
+console.log(err);
+popup("Server connection failed");
 }
-);
+});
+
+// ======================
+// INIT
+// ======================
+loadRequestsFromDB();

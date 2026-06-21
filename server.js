@@ -51,73 +51,206 @@ db.connect((err) => {
 // =====================
 // AUTH (REGISTER + LOGIN)
 // =====================
+
 app.post("/api/auth", async (req, res) => {
-  try {
-    const { fullName, email, password } = req.body;
 
-    if (!fullName || !email || !password) {
-      return res.status(400).json({ message: "All fields required" });
-    }
+try{
 
-    db.query(
-      "SELECT * FROM requesters WHERE email = ?",
-      [email],
-      async (err, rows) => {
-        if (err) {
-          console.log(err);
-          return res.status(500).json({
-  message: err.message
+console.log("BODY:", req.body);
+
+const {
+fullName,
+email,
+password
+}=req.body;
+
+if(
+!fullName ||
+!email ||
+!password
+){
+
+return res
+.status(400)
+.json({
+message:
+"Missing fields"
 });
-        }
 
-        // LOGIN
-        if (rows.length > 0) {
-          const user = rows[0];
+}
 
-          const ok = await bcrypt.compare(password, user.password_hash);
+db.query(
 
-          if (!ok) {
-            return res.status(401).json({ message: "Invalid password" });
-          }
+"SELECT * FROM requesters WHERE email=?",
 
-          return res.json({
-            message: "Login successful",
-            user: {
-              id: user.id,
-              name: user.full_name,
-              email: user.email
-            }
-          });
-        }
+[email],
 
-        // REGISTER
-        const hash = await bcrypt.hash(password, 10);
+async (
+err,
+rows
+)=>{
 
-        db.query(
-          "INSERT INTO requesters (full_name, email, password_hash) VALUES (?, ?, ?)",
-          [fullName, email, hash],
-          (err, result) => {
-            if (err) {
-              console.log(err);
-              return res.status(500).json({ message: "Account creation failed" });
-            }
+if(err){
 
-            return res.json({
-              message: "Account created",
-              user: {
-                id: result.insertId,
-                name: fullName,
-                email
-              }
-            });
-          }
-        );
-      }
-    );
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Server error" });
-  }
+console.error(
+"DB SELECT ERROR:",
+err
+);
+
+return res
+.status(500)
+.json({
+message:
+err.message
+});
+
+}
+
+console.log(
+"Rows:",
+rows.length
+);
+
+
+// LOGIN
+if(
+rows.length>0
+){
+
+const user=
+rows[0];
+
+console.log(
+"User found"
+);
+
+const ok=
+await bcrypt.compare(
+password,
+user.password_hash
+);
+
+console.log(
+"Password match:",
+ok
+);
+
+if(!ok){
+
+return res
+.status(401)
+.json({
+message:
+"Invalid password"
+});
+
+}
+
+return res.json({
+
+message:
+"Login successful",
+
+user:{
+
+id:user.id,
+
+name:
+user.full_name,
+
+email:
+user.email
+
+}
+
+});
+
+}
+
+
+// REGISTER
+const hash=
+await bcrypt.hash(
+password,
+10
+);
+
+db.query(
+
+`INSERT INTO requesters
+(full_name,email,password_hash)
+VALUES(?,?,?)`,
+
+[
+fullName,
+email,
+hash
+],
+
+(
+err,
+result
+)=>{
+
+if(err){
+
+console.error(
+"INSERT ERROR:",
+err
+);
+
+return res
+.status(500)
+.json({
+message:
+err.message
+});
+
+}
+
+return res.json({
+
+message:
+"Account created",
+
+user:{
+
+id:
+result.insertId,
+
+name:
+fullName,
+
+email
+
+}
+
+});
+
+}
+
+);
+
+}
+
+);
+
+}catch(err){
+
+console.error(
+"AUTH ERROR:",
+err
+);
+
+res
+.status(500)
+.json({
+message:
+err.message
+});
+
+}
+
 });
 
 // =====================
