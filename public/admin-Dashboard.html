@@ -5,13 +5,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Modern Waste Admin Dashboard</title>
+<title>Waste Admin Dashboard</title>
 
 <style>
 
-/* =====================
-RESET
-===================== */
+/* RESET */
 *{
 margin:0;
 padding:0;
@@ -20,75 +18,47 @@ font-family:Arial, sans-serif;
 }
 
 body{
-display:flex;
-min-height:100vh;
 background:#f4f6f9;
 }
 
-/* =====================
-SIDEBAR
-===================== */
-.sidebar{
-width:240px;
-background:#0b8457;
-color:white;
+/* LAYOUT */
+.container{
+max-width:1200px;
+margin:auto;
 padding:20px;
 }
 
-.sidebar h2{
-font-size:18px;
+/* STATS */
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
 margin-bottom:20px;
 }
 
-.sidebar a{
-display:block;
-color:white;
-text-decoration:none;
-padding:10px;
-border-radius:6px;
-margin-bottom:8px;
+.box{
+background:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+font-weight:bold;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
-.sidebar a:hover{
-background:rgba(255,255,255,0.2);
-}
-
-/* =====================
-MAIN CONTENT
-===================== */
-.main{
-flex:1;
-padding:20px;
-}
-
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-}
-
-.header h1{
-font-size:22px;
-}
-
-/* =====================
-GRID
-===================== */
+/* GRID */
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:15px;
 }
 
-/* =====================
-CARD
-===================== */
+/* CARD */
 .card{
 background:white;
 padding:15px;
 border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.08);
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
+border-left:5px solid #0b8457;
 }
 
 .card p{
@@ -96,9 +66,7 @@ margin:6px 0;
 font-size:14px;
 }
 
-/* =====================
-STATUS
-===================== */
+/* STATUS */
 .status{
 display:inline-block;
 padding:4px 10px;
@@ -109,15 +77,15 @@ color:white;
 
 .pending{background:#f0ad4e;}
 .approved{background:#28a745;}
+.rejected{background:#dc3545;}
 .assigned{background:#007bff;}
 
-/* =====================
-BUTTONS
-===================== */
+/* BUTTONS */
 .actions{
-margin-top:10px;
 display:flex;
 gap:8px;
+margin-top:10px;
+flex-wrap:wrap;
 }
 
 button{
@@ -130,35 +98,18 @@ font-size:13px;
 }
 
 .approve{background:#28a745;color:white;}
+.reject{background:#dc3545;color:white;}
 .assign{background:#007bff;color:white;}
 
 button:hover{
 opacity:0.85;
 }
 
-/* =====================
-MOBILE
-===================== */
+/* MOBILE */
 @media(max-width:768px){
 
-body{
-flex-direction:column;
-}
-
-.sidebar{
-display:none;
-}
-
-.header h1{
-font-size:18px;
-}
-
-.actions{
-flex-direction:column;
-}
-
-button{
-width:100%;
+.stats{
+grid-template-columns:repeat(2,1fr);
 }
 
 }
@@ -169,44 +120,57 @@ width:100%;
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-<h2>Waste Admin</h2>
-<a href="#">Dashboard</a>
-<a href="#">Requests</a>
-<a href="#">Trucks</a>
-<a href="#">Logout</a>
-</div>
+<div class="container">
 
-<!-- MAIN -->
-<div class="main">
+<h2>Waste Management Admin Dashboard</h2>
 
-<div class="header">
-<h1>Waste Collection Requests</h1>
-</div>
+<!-- STATS -->
+<div id="stats" class="stats"></div>
 
-<div class="grid" id="requestGrid">
-Loading requests...
-</div>
+<!-- REQUEST GRID -->
+<div id="grid" class="grid">Loading...</div>
 
 </div>
 
 <script>
 
+// =====================
+// LOAD STATS
+// =====================
+async function loadStats(){
+
+const res = await fetch("/api/requests");
+const data = await res.json();
+
+let pending = data.filter(r => (r.status||"").toLowerCase()==="pending").length;
+let approved = data.filter(r => (r.status||"").toLowerCase()==="approved").length;
+let rejected = data.filter(r => (r.status||"").toLowerCase()==="rejected").length;
+let assigned = data.filter(r => r.assigned_truck).length;
+
+document.getElementById("stats").innerHTML = `
+<div class="box">Pending: ${pending}</div>
+<div class="box">Approved: ${approved}</div>
+<div class="box">Rejected: ${rejected}</div>
+<div class="box">Assigned: ${assigned}</div>
+`;
+}
+
+// =====================
+// LOAD REQUESTS
+// =====================
 async function loadRequests(){
 
-const container =
-document.getElementById("requestGrid");
+const grid = document.getElementById("grid");
 
 try{
 
 const res = await fetch("/api/requests");
 const data = await res.json();
 
-container.innerHTML="";
+grid.innerHTML = "";
 
-if(!data || data.length===0){
-container.innerHTML="No requests found";
+if(!data.length){
+grid.innerHTML = "No requests found";
 return;
 }
 
@@ -216,19 +180,18 @@ let status = (r.status || "Pending").toLowerCase();
 
 let statusClass =
 status === "approved" ? "approved" :
+status === "rejected" ? "rejected" :
 status === "assigned" ? "assigned" : "pending";
 
-container.innerHTML += `
+grid.innerHTML += `
 <div class="card">
 
-<p><b>Full Name:</b> ${r.name || "-"}</p>
-<p><b>Location:</b> ${r.location || "-"}</p>
-<p><b>Phone:</b> ${r.phone || "-"}</p>
-<p><b>Email:</b> ${r.email || "-"}</p>
-<p><b>Waste Type:</b> ${r.wasteType || "-"}</p>
+<p><b>Name:</b> ${r.name}</p>
+<p><b>Location:</b> ${r.location}</p>
+<p><b>Phone:</b> ${r.phone}</p>
+<p><b>Email:</b> ${r.email}</p>
+<p><b>Waste Type:</b> ${r.wasteType}</p>
 <p><b>Additional Info:</b> ${r.additionalInfo || "-"}</p>
-
-<p><b>Created:</b> ${r.created_at ? new Date(r.created_at).toLocaleString() : "-"}</p>
 
 <p>
 <span class="status ${statusClass}">
@@ -238,11 +201,20 @@ ${r.status || "Pending"}
 
 <p><b>Truck:</b> ${r.assigned_truck || "-"}</p>
 
+<p><b>Action By:</b> ${r.action_by || "-"}</p>
+<p><b>Remarks:</b> ${r.remarks || "-"}</p>
+<p><b>Rejection Reason:</b> ${r.rejection_reason || "-"}</p>
+
 <div class="actions">
 
 <button class="approve"
 onclick="approveRequest(${r.id})">
 Approve
+</button>
+
+<button class="reject"
+onclick="rejectRequest(${r.id})">
+Reject
 </button>
 
 <button class="assign"
@@ -257,20 +229,56 @@ Assign
 });
 
 }catch(err){
-console.log(err);
-container.innerHTML="Failed to load requests";
+grid.innerHTML = "Failed to load requests";
 }
 
 }
 
+// =====================
+// APPROVE
+// =====================
 async function approveRequest(id){
-await fetch(`/api/requests/approve/${id}`, {method:"PUT"});
+
+await fetch(`/api/requests/approve/${id}`, {
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+admin:"Admin",
+remarks:"Approved via dashboard"
+})
+});
+
 loadRequests();
+loadStats();
 }
 
+// =====================
+// REJECT
+// =====================
+async function rejectRequest(id){
+
+let reason = prompt("Enter rejection reason:");
+if(!reason) return;
+
+await fetch(`/api/requests/reject/${id}`, {
+method:"PUT",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+reason,
+admin:"Admin"
+})
+});
+
+loadRequests();
+loadStats();
+}
+
+// =====================
+// ASSIGN TRUCK
+// =====================
 async function assignTruck(id){
 
-const truck = prompt("Enter truck number:");
+let truck = prompt("Enter truck number:");
 if(!truck) return;
 
 await fetch(`/api/requests/assign/${id}`, {
@@ -280,9 +288,14 @@ body:JSON.stringify({truck})
 });
 
 loadRequests();
+loadStats();
 }
 
-window.onload = loadRequests;
+// INIT
+window.onload = () => {
+loadRequests();
+loadStats();
+};
 
 </script>
 
