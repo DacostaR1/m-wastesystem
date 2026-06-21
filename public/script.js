@@ -106,6 +106,7 @@ logged.innerHTML = `Logged in as: ${user.name}`;
 // ======================
 // LOGIN / REGISTER
 // ======================
+
 document.getElementById("loginForm")
 ?.addEventListener("submit", async function(e){
 
@@ -113,7 +114,7 @@ e.preventDefault();
 
 try{
 
-const response = await fetch("/api/auth", {
+const response = await fetch(`${API_BASE}/api/auth`, {
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -150,6 +151,7 @@ popup("Server unavailable. Please try again later.");
 }
 
 });
+
 
 // ======================
 // SUBMIT WASTE REQUEST
