@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Waste Collection System - Rubaga</title>
+<title>Mobile Waste Collection System - Rubaga</title>
 
 <style>
 
@@ -230,30 +230,23 @@ margin-top:30px;
 /* =====================
 RESPONSIVE
 ===================== */
+
 @media(max-width:768px){
 
-header h1{
-font-size:18px;
-}
-
-.logo-row img{
-width:55px;
-}
-
 nav{
-flex-direction:column;
+flex-direction:row;
+justify-content:flex-start;
+overflow-x:auto;
+white-space:nowrap;
+-webkit-overflow-scrolling:touch;
+gap:8px;
+padding:10px;
 }
 
 nav a{
-width:100%;
-text-align:center;
-}
-
-.card{
-padding:15px;
-}
-
-button{
+flex:0 0 auto;
+display:inline-block;
+padding:8px 14px;
 font-size:14px;
 }
 
@@ -299,6 +292,16 @@ font-size:14px;
 <section id="home" class="card">
 <h2>Welcome</h2>
 <p>A smart digital waste management system for residents and administrators.</p>
+<p>
+Users can easily submit requests, track their status in real time, 
+and receive updates when a truck has been assigned or a request has been completed.
+</p>
+
+<p>
+Administrators benefit from a centralized dashboard that allows them
+ to approve, reject, assign trucks, and monitor overall waste collection operations efficiently.
+</p>
+
 </section>
 
 <!-- AUTH -->

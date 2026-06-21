@@ -24,13 +24,14 @@ async function loadRequestsFromDB() {
   try {
     const res = await fetch(`${API_BASE}/api/requests`);
 
-    if (!res.ok) throw new Error("Failed to fetch requests");
+    if (!res.ok) throw new Error("Failed to fetch");
 
     requests = await res.json();
     render();
+
   } catch (err) {
     console.log("LOAD ERROR:", err);
-    popup("Failed to load requests");
+    popup("Server connection failed");
   }
 }
 
@@ -48,150 +49,161 @@ function render() {
     return;
   }
 
-  requests.forEach((r) => {
+  requests.forEach(r => {
     table.innerHTML += `
       <tr>
         <td>${r.name || "-"}</td>
         <td>${r.location || "-"}</td>
         <td>${r.phone || "-"}</td>
-        <td class="status-${(r.status || "pending").toLowerCase()}">
-          ${r.status || "Pending"}
-        </td>
+        <td>${r.status || "Pending"}</td>
       </tr>
     `;
   });
 }
 
 // ======================
-// UNLOCK UI AFTER LOGIN
-// ======================
-function unlockForm() {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) return;
-
-  const requestSection = document.getElementById("request");
-  if (requestSection) requestSection.classList.remove("hidden");
-
-  const authSection = document.getElementById("auth");
-  if (authSection) authSection.style.display = "none";
-
-  const logged = document.getElementById("loggedUser");
-  if (logged) {
-    logged.innerHTML = `Logged in as: ${user.name}`;
-  }
-}
-
-// ======================
 // LOGIN / REGISTER
 // ======================
-document
-  .getElementById("loginForm")
-  ?.addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    try {
-      const userName = document.getElementById("userName")?.value;
-      const userEmail = document.getElementById("userEmail")?.value;
-      const userPassword = document.getElementById("userPassword")?.value;
+  try {
+    const fullName = document.getElementById("userName")?.value;
+    const email = document.getElementById("userEmail")?.value;
+    const password = document.getElementById("userPassword")?.value;
 
-      // FIX: prevent null value crash
-      if (!userName || !userEmail || !userPassword) {
-        popup("Please fill all fields");
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/api/auth`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: userName,
-          email: userEmail,
-          password: userPassword,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        popup(result.message || "Login failed");
-        return;
-      }
-
-      localStorage.setItem("user", JSON.stringify(result.user));
-
-      unlockForm();
-
-      popup(
-        result.message === "Account created"
-          ? "Account created & logged in"
-          : "Login successful"
-      );
-
-      e.target.reset();
-      loadRequestsFromDB();
-    } catch (err) {
-      console.log("LOGIN ERROR:", err);
-      popup("Server unavailable");
+    if (!fullName || !email || !password) {
+      popup("Fill all fields");
+      return;
     }
-  });
+
+    const response = await fetch(`${API_BASE}/api/auth`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fullName, email, password })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      popup(result.message || "Login failed");
+      return;
+    }
+
+    // SAVE USER
+    localStorage.setItem("user", JSON.stringify(result.user));
+
+    // SWITCH UI
+    unlockForm();
+
+    popup(result.message || "Login successful");
+
+    e.target.reset();
+    loadRequestsFromDB();
+
+  } catch (err) {
+    console.log(err);
+    popup("Server unavailable");
+  }
+});
 
 // ======================
-// SUBMIT REQUEST
+// REQUEST SUBMIT
 // ======================
-document
-  .getElementById("wasteForm")
-  ?.addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.getElementById("wasteForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    try {
-      const name = document.getElementById("fullName")?.value;
-      const location = document.getElementById("location")?.value;
-      const phone = document.getElementById("phone")?.value;
-      const email = document.getElementById("email")?.value;
-      const wasteType = document.getElementById("wasteType")?.value;
-      const additionalInfo = document.getElementById("additionalInfo")?.value;
+  try {
+    const name = document.getElementById("fullName")?.value;
+    const location = document.getElementById("location")?.value;
+    const phone = document.getElementById("phone")?.value;
+    const email = document.getElementById("email")?.value;
+    const wasteType = document.getElementById("wasteType")?.value;
+    const additionalInfo = document.getElementById("additionalInfo")?.value;
 
-      if (!name || !location || !phone || !wasteType) {
-        popup("Please fill required fields");
-        return;
-      }
+    if (!name || !location || !phone || !wasteType) {
+      popup("Fill required fields");
+      return;
+    }
 
-      const data = {
+    const response = await fetch(`${API_BASE}/api/requests`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         name,
         location,
         phone,
         email,
         wasteType,
-        additionalInfo,
-      };
+        additionalInfo
+      })
+    });
 
-      const response = await fetch(`${API_BASE}/api/requests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+    const result = await response.json();
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        popup(result.message || "Failed to submit");
-        return;
-      }
-
-      popup("Request submitted successfully");
-
-      e.target.reset();
-      loadRequestsFromDB();
-    } catch (err) {
-      console.log("REQUEST ERROR:", err);
-      popup("Server connection failed");
+    if (!response.ok) {
+      popup(result.message || "Failed");
+      return;
     }
-  });
+
+    popup("Request submitted");
+
+    e.target.reset();
+    loadRequestsFromDB();
+
+  } catch (err) {
+    console.log(err);
+    popup("Server connection failed");
+  }
+});
+
+// ======================
+// FIXED LOGIN UI SWITCH
+// ======================
+function unlockForm() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) return;
+
+  const auth = document.getElementById("auth");
+  const request = document.getElementById("request");
+  const loggedUser = document.getElementById("loggedUser");
+
+  // FORCE consistent UI state
+  if (auth) auth.style.display = "none";
+
+  if (request) {
+    request.classList.remove("hidden");
+    request.style.display = "block";
+  }
+
+  if (loggedUser) {
+    loggedUser.innerText = `Logged in as: ${user.name}`;
+  }
+}
+
+// ======================
+// LOGOUT
+// ======================
+function logout() {
+  localStorage.removeItem("user");
+  location.reload();
+}
 
 // ======================
 // INIT
 // ======================
 window.addEventListener("load", () => {
-  unlockForm();
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (user) {
+    unlockForm();
+  } else {
+    const auth = document.getElementById("auth");
+    const request = document.getElementById("request");
+
+    if (auth) auth.style.display = "block";
+    if (request) request.classList.add("hidden");
+  }
+
   loadRequestsFromDB();
 });
