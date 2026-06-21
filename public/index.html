@@ -305,7 +305,6 @@ font-size:14px;
 <section id="auth" class="card">
 <h2>Login / Register</h2>
 <p id="loggedUser"></p>
-
 <form id="loginForm">
 
 <input id="userName" type="text" placeholder="Full Name" required>
@@ -325,12 +324,16 @@ font-size:14px;
 <h2>Waste Request Form</h2>
 
 <form id="wasteForm">
-<input type="text" placeholder="Full Name" required>
-<input type="text" placeholder="Location" required>
-<input type="tel" placeholder="Phone" required>
-<input type="email" placeholder="Email">
 
-<select required>
+<input id="fullName" type="text" placeholder="Full Name" required>
+
+<input id="location" type="text" placeholder="Location" required>
+
+<input id="phone" type="tel" placeholder="Phone" required>
+
+<input id="email" type="email" placeholder="Email">
+
+<select id="wasteType" required>
 <option value="">Select Waste Type</option>
 <option>Plastic</option>
 <option>Organic</option>
@@ -338,9 +341,10 @@ font-size:14px;
 <option>General</option>
 </select>
 
-<textarea placeholder="Additional Info"></textarea>
+<textarea id="additionalInfo" placeholder="Additional Info"></textarea>
 
 <button type="submit">Submit Request</button>
+
 </form>
 
 </section>
