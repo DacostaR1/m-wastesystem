@@ -210,7 +210,7 @@ app.get("/api/requests", (req, res) => {
 
   if (email) {
     db.query(
-      "SELECT * FROM requests WHERE email = ? ORDER BY id DESC",
+      "SELECT * FROM requests WHERE email = ? ORDER BY id ASC",
       [email],
       (err, rows) => {
         if (err) {
@@ -223,7 +223,7 @@ app.get("/api/requests", (req, res) => {
   }
 
   db.query(
-    "SELECT * FROM requests ORDER BY id DESC",
+    "SELECT * FROM requests ORDER BY id ASC",
     (err, rows) => {
       if (err) {
         return res.status(500).json([]);
@@ -237,29 +237,42 @@ app.get("/api/requests", (req, res) => {
 // APPROVE
 // =====================
 app.put("/api/requests/approve/:id", (req, res) => {
-  db.query(
-    "UPDATE requests SET status='Approved' WHERE id=?",
-    [req.params.id],
-    (err) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Approved" });
-    }
-  );
+
+const { admin, remarks } = req.body;
+
+db.query(
+`UPDATE requests 
+ SET status='Approved',
+ action_by=?,
+ approver_remarks=?
+ WHERE id=?`,
+[admin || "Admin", remarks || "Approved via system", req.params.id],
+(err) => {
+if (err) return res.status(500).json(err);
+res.json({ message: "Approved" });
+});
 });
 
 // =====================
 // REJECT
 // =====================
 app.put("/api/requests/reject/:id", (req, res) => {
-  db.query(
-    "UPDATE requests SET status='Rejected' WHERE id=?",
-    [req.params.id],
-    (err) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Rejected" });
-    }
-  );
+
+const { reason, admin } = req.body;
+
+db.query(
+`UPDATE requests 
+ SET status='Rejected',
+ rejection_reason=?,
+ action_by=?
+ WHERE id=?`,
+[reason, admin || "Admin", req.params.id],
+(err) => {
+if (err) return res.status(500).json(err);
+res.json({ message: "Rejected" });
 });
+});
+
 
 // =====================
 // ASSIGN TRUCK
