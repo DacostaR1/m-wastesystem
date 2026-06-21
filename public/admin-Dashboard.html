@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -74,7 +73,7 @@ font-size:22px;
 }
 
 /* =====================
-CARDS GRID
+GRID
 ===================== */
 .grid{
 display:grid;
@@ -97,7 +96,9 @@ margin:6px 0;
 font-size:14px;
 }
 
-/* STATUS */
+/* =====================
+STATUS
+===================== */
 .status{
 display:inline-block;
 padding:4px 10px;
@@ -110,7 +111,9 @@ color:white;
 .approved{background:#28a745;}
 .assigned{background:#007bff;}
 
-/* BUTTONS */
+/* =====================
+BUTTONS
+===================== */
 .actions{
 margin-top:10px;
 display:flex;
@@ -138,16 +141,24 @@ MOBILE
 ===================== */
 @media(max-width:768px){
 
-.sidebar{
-display:none;
-}
-
 body{
 flex-direction:column;
 }
 
+.sidebar{
+display:none;
+}
+
 .header h1{
 font-size:18px;
+}
+
+.actions{
+flex-direction:column;
+}
+
+button{
+width:100%;
 }
 
 }
@@ -159,7 +170,6 @@ font-size:18px;
 <body>
 
 <!-- SIDEBAR -->
-
 <div class="sidebar">
 <h2>Waste Admin</h2>
 <a href="#">Dashboard</a>
@@ -169,7 +179,6 @@ font-size:18px;
 </div>
 
 <!-- MAIN -->
-
 <div class="main">
 
 <div class="header">
@@ -191,32 +200,35 @@ document.getElementById("requestGrid");
 
 try{
 
-const res =
-await fetch("/api/requests");
-
-const data =
-await res.json();
+const res = await fetch("/api/requests");
+const data = await res.json();
 
 container.innerHTML="";
 
-if(data.length===0){
+if(!data || data.length===0){
 container.innerHTML="No requests found";
 return;
 }
 
-data.forEach(r=>{
+data.forEach(r => {
+
+let status = (r.status || "Pending").toLowerCase();
 
 let statusClass =
-r.status==="Approved" ? "approved" :
-r.status==="Assigned" ? "assigned" : "pending";
+status === "approved" ? "approved" :
+status === "assigned" ? "assigned" : "pending";
 
-container.innerHTML+=`
-
+container.innerHTML += `
 <div class="card">
 
-<p><b>Name:</b> ${r.name}</p>
-<p><b>Location:</b> ${r.location}</p>
-<p><b>Waste:</b> ${r.wasteType}</p>
+<p><b>Full Name:</b> ${r.name || "-"}</p>
+<p><b>Location:</b> ${r.location || "-"}</p>
+<p><b>Phone:</b> ${r.phone || "-"}</p>
+<p><b>Email:</b> ${r.email || "-"}</p>
+<p><b>Waste Type:</b> ${r.wasteType || "-"}</p>
+<p><b>Additional Info:</b> ${r.additionalInfo || "-"}</p>
+
+<p><b>Created:</b> ${r.created_at ? new Date(r.created_at).toLocaleString() : "-"}</p>
 
 <p>
 <span class="status ${statusClass}">
@@ -241,12 +253,11 @@ Assign
 </div>
 
 </div>
-
 `;
-
 });
 
 }catch(err){
+console.log(err);
 container.innerHTML="Failed to load requests";
 }
 
