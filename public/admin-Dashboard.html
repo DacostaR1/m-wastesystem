@@ -1,153 +1,153 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Admin Dashboard - Waste Requests</title>
+<title>Modern Waste Admin Dashboard</title>
 
 <style>
 
+/* =====================
+RESET
+===================== */
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
+font-family:Arial, sans-serif;
 }
 
 body{
-font-family:Arial,sans-serif;
-padding:15px;
-background:#f5f5f5;
-}
-
-/* HEADER */
-
-.logo-container{
 display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:10px;
+min-height:100vh;
+background:#f4f6f9;
+}
+
+/* =====================
+SIDEBAR
+===================== */
+.sidebar{
+width:240px;
+background:#0b8457;
+color:white;
+padding:20px;
+}
+
+.sidebar h2{
+font-size:18px;
 margin-bottom:20px;
 }
 
-.logo-container img{
-width:120px;
-height:auto;
-max-width:100%;
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+padding:10px;
+border-radius:6px;
+margin-bottom:8px;
 }
 
-/* DESCRIPTION */
+.sidebar a:hover{
+background:rgba(255,255,255,0.2);
+}
 
-.page-description{
+/* =====================
+MAIN CONTENT
+===================== */
+.main{
+flex:1;
+padding:20px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.header h1{
+font-size:22px;
+}
+
+/* =====================
+CARDS GRID
+===================== */
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+gap:15px;
+}
+
+/* =====================
+CARD
+===================== */
+.card{
 background:white;
 padding:15px;
-border-radius:8px;
-margin-bottom:20px;
-line-height:1.6;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
 
-/* NAV */
-
-nav{
-margin-bottom:20px;
-}
-
-nav a{
-text-decoration:none;
-background:#0b8457;
-color:white;
-padding:10px 15px;
-border-radius:6px;
-display:inline-block;
-}
-
-/* TABLE */
-
-.table-wrapper{
-overflow-x:auto;
-background:white;
-border-radius:8px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-min-width:900px;
-}
-
-th,td{
-padding:12px;
-border:1px solid #ddd;
-text-align:left;
-}
-
-th{
-background:#0b8457;
-color:white;
-}
-
-button{
-padding:8px 12px;
-border:none;
-border-radius:5px;
-cursor:pointer;
-margin:3px;
-}
-
-.approve{
-background:#28a745;
-color:white;
-}
-
-.assign{
-background:#007bff;
-color:white;
-}
-
-button:hover{
-opacity:0.9;
-}
-
-/* FOOTER */
-
-footer{
-text-align:center;
-margin-top:30px;
-padding:20px;
-background:#0b8457;
-color:white;
-}
-
-/* MOBILE */
-
-@media (max-width:768px){
-
-body{
-padding:10px;
-}
-
-.logo-container{
-justify-content:center;
-}
-
-.logo-container img{
-width:80px;
-}
-
-.page-description{
+.card p{
+margin:6px 0;
 font-size:14px;
 }
 
-nav a{
-width:100%;
-text-align:center;
+/* STATUS */
+.status{
+display:inline-block;
+padding:4px 10px;
+border-radius:20px;
+font-size:12px;
+color:white;
+}
+
+.pending{background:#f0ad4e;}
+.approved{background:#28a745;}
+.assigned{background:#007bff;}
+
+/* BUTTONS */
+.actions{
+margin-top:10px;
+display:flex;
+gap:8px;
 }
 
 button{
-width:100%;
-margin-bottom:5px;
+flex:1;
+padding:8px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-size:13px;
+}
+
+.approve{background:#28a745;color:white;}
+.assign{background:#007bff;color:white;}
+
+button:hover{
+opacity:0.85;
+}
+
+/* =====================
+MOBILE
+===================== */
+@media(max-width:768px){
+
+.sidebar{
+display:none;
+}
+
+body{
+flex-direction:column;
+}
+
+.header h1{
+font-size:18px;
 }
 
 }
@@ -158,194 +158,117 @@ margin-bottom:5px;
 
 <body>
 
-<div class="logo-container">
+<!-- SIDEBAR -->
 
-<img src="Truck.jfif" alt="Truck">
-<img src="Logo.jpg" alt="Logo">
-<img src="Logo.jpg" alt="Logo">
-<img src="Logo.jpg" alt="Logo">
-<img src="Logo.jpg" alt="Logo">
-<img src="Truck.jfif" alt="Truck">
-
+<div class="sidebar">
+<h2>Waste Admin</h2>
+<a href="#">Dashboard</a>
+<a href="#">Requests</a>
+<a href="#">Trucks</a>
+<a href="#">Logout</a>
 </div>
 
-<div class="page-description">
+<!-- MAIN -->
 
-<p>
-Welcome to the Waste Collection Administration Dashboard.
-Monitor and manage waste collection requests submitted by users.
-</p>
+<div class="main">
 
-<br>
-
-<p>
-Approve or reject requests, assign trucks and track progress.
-</p>
-
+<div class="header">
+<h1>Waste Collection Requests</h1>
 </div>
 
-<nav>
-<a href="index.html">Home</a>
-</nav>
-
-<h2 style="margin-bottom:15px;">
-Waste Collection Requests
-</h2>
-
-<div class="table-wrapper">
-
-<table>
-
-<thead>
-
-<tr>
-<th>ID</th>
-<th>Name</th>
-<th>Phone</th>
-<th>Location</th>
-<th>Waste Type</th>
-<th>Status</th>
-<th>Truck Number</th>
-<th>Actions</th>
-</tr>
-
-</thead>
-
-<tbody id="requestTable">
-
-<tr>
-<td colspan="8">
+<div class="grid" id="requestGrid">
 Loading requests...
-</td>
-</tr>
-
-</tbody>
-
-</table>
-
 </div>
 
-<footer>
-
-<p>
-© 2026 Waste Collection System Rubaga
-</p>
-
-<p>
-Developed by VU Finalist 2026 Team
-</p>
-
-</footer>
+</div>
 
 <script>
 
 async function loadRequests(){
 
-const table =
-document.getElementById("requestTable");
+const container =
+document.getElementById("requestGrid");
 
 try{
 
-table.innerHTML=
-`<tr><td colspan="8">Loading...</td></tr>`;
-
-const response=
+const res =
 await fetch("/api/requests");
 
-const requests=
-await response.json();
+const data =
+await res.json();
 
-table.innerHTML="";
+container.innerHTML="";
 
-if(requests.length===0){
-
-table.innerHTML=
-`<tr><td colspan="8">No requests found</td></tr>`;
-
+if(data.length===0){
+container.innerHTML="No requests found";
 return;
-
 }
 
-requests.forEach(r=>{
+data.forEach(r=>{
 
-table.innerHTML+=`
+let statusClass =
+r.status==="Approved" ? "approved" :
+r.status==="Assigned" ? "assigned" : "pending";
 
-<tr>
+container.innerHTML+=`
 
-<td>${r.id}</td>
-<td>${r.name}</td>
-<td>${r.phone||"-"}</td>
-<td>${r.location}</td>
-<td>${r.wasteType}</td>
-<td>${r.status||"Pending"}</td>
-<td>${r.assigned_truck||"-"}</td>
+<div class="card">
 
-<td>
+<p><b>Name:</b> ${r.name}</p>
+<p><b>Location:</b> ${r.location}</p>
+<p><b>Waste:</b> ${r.wasteType}</p>
 
-<button
-class="approve"
+<p>
+<span class="status ${statusClass}">
+${r.status || "Pending"}
+</span>
+</p>
+
+<p><b>Truck:</b> ${r.assigned_truck || "-"}</p>
+
+<div class="actions">
+
+<button class="approve"
 onclick="approveRequest(${r.id})">
-
 Approve
-
 </button>
 
-<button
-class="assign"
+<button class="assign"
 onclick="assignTruck(${r.id})">
-
 Assign
-
 </button>
 
-</td>
+</div>
 
-</tr>
+</div>
 
 `;
 
 });
 
-}catch{
-
-table.innerHTML=
-`<tr><td colspan="8">Failed to load requests</td></tr>`;
-
+}catch(err){
+container.innerHTML="Failed to load requests";
 }
 
 }
 
 async function approveRequest(id){
-
-await fetch(
-`/api/requests/approve/${id}`,
-{method:"PUT"}
-);
-
+await fetch(`/api/requests/approve/${id}`, {method:"PUT"});
 loadRequests();
-
 }
 
 async function assignTruck(id){
 
-const truck =
-prompt("Enter truck number:");
-
+const truck = prompt("Enter truck number:");
 if(!truck) return;
 
-await fetch(
-`/api/requests/assign/${id}`,
-{
+await fetch(`/api/requests/assign/${id}`, {
 method:"PUT",
-headers:{
-"Content-Type":"application/json"
-},
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify({truck})
-}
-);
+});
 
 loadRequests();
-
 }
 
 window.onload = loadRequests;
@@ -353,5 +276,4 @@ window.onload = loadRequests;
 </script>
 
 </body>
-
 </html>
