@@ -61,29 +61,25 @@ background:white;
 padding:3px;
 }
 
-/* =====================
-NAVIGATION
-===================== */
+/*
+NAVIGATION 
+==================== */
+
 nav{
 position:sticky;
 top:0;
-z-index:1000;
 background:white;
 display:flex;
 justify-content:center;
-flex-wrap:wrap;
-gap:10px;
+flex-wrap:nowrap;
+overflow-x:auto;
+gap:8px;
 padding:10px;
-box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
 nav a{
-text-decoration:none;
-color:#0b8457;
-font-weight:600;
-padding:8px 14px;
-border-radius:6px;
-transition:0.2s;
+flex:0 0 auto;
+white-space:nowrap;
 }
 
 nav a:hover{

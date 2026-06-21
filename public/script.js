@@ -1,8 +1,11 @@
+
 let requests = [];
 
+// ======================
+// POPUP
+// ======================
 function popup(msg){
 const p = document.getElementById("popup");
-
 if(!p) return;
 
 p.innerText = msg;
@@ -14,42 +17,57 @@ p.style.display = "none";
 }
 
 // ======================
-// RENDER REQUEST TABLE
+// LOAD REQUESTS FROM BACKEND (IMPORTANT)
+// ======================
+async function loadRequestsFromDB(){
+
+try{
+
+const res = await fetch("/api/requests");
+
+if(!res.ok) throw new Error("API error");
+
+requests = await res.json();
+
+render();
+
+}catch(err){
+
+console.log(err);
+popup("Failed to load requests from server");
+
+}
+
+}
+
+// ======================
+// RENDER TABLE
 // ======================
 function render(){
 
-const table =
-document.getElementById("requestTable");
-
+const table = document.getElementById("requestTable");
 if(!table) return;
 
 table.innerHTML = "";
 
-if(requests.length===0){
+if(requests.length === 0){
 
-table.innerHTML=`
-
+table.innerHTML = `
 <tr>
-<td colspan="4">
-No requests submitted
-</td>
+<td colspan="4">No requests submitted</td>
 </tr>
 `;
-
 return;
 
 }
 
-requests.forEach(r=>{
+requests.forEach(r => {
 
 table.innerHTML += `
-
 <tr>
 
 <td>${r.name}</td>
-
 <td>${r.location}</td>
-
 <td>${r.phone}</td>
 
 <td class="status-${(r.status || "pending").toLowerCase()}">
@@ -64,30 +82,21 @@ ${r.status || "Pending"}
 }
 
 // ======================
-// SHOW USER AREA
+// SHOW REQUEST FORM AFTER LOGIN
 // ======================
 function unlockForm(){
 
-const user =
-JSON.parse(
-localStorage.getItem("user")
-);
+const user = JSON.parse(localStorage.getItem("user"));
 
 if(user){
 
-document
-.getElementById("request")
-?.classList
-.remove("hidden");
+document.getElementById("request")
+?.classList.remove("hidden");
 
-const logged =
-document.getElementById("loggedUser");
+const logged = document.getElementById("loggedUser");
 
 if(logged){
-
-logged.innerHTML =
-`Logged in: ${user.name}`;
-
+logged.innerHTML = `Logged in as: ${user.name}`;
 }
 
 }
@@ -97,172 +106,100 @@ logged.innerHTML =
 // ======================
 // LOGIN / REGISTER
 // ======================
-document
-.getElementById("loginForm")
-?.addEventListener(
-"submit",
-
-async function(e){
+document.getElementById("loginForm")
+?.addEventListener("submit", async function(e){
 
 e.preventDefault();
 
 try{
 
-const response =
-await fetch(
-"/api/auth",
-{
+const response = await fetch("/api/auth", {
 method:"POST",
-
 headers:{
 "Content-Type":"application/json"
 },
-
 body:JSON.stringify({
-
-fullName:
-document.getElementById("userName").value,
-
-email:
-document.getElementById("userEmail").value,
-
-password:
-document.getElementById("userPassword").value
-
+fullName: document.getElementById("userName").value,
+email: document.getElementById("userEmail").value,
+password: document.getElementById("userPassword").value
 })
+});
 
-}
-);
-
-const result =
-await response.json();
+const result = await response.json();
 
 if(!response.ok){
-
-popup(result.message);
-
+popup(result.message || "Login failed");
 return;
-
 }
 
-localStorage.setItem(
-"user",
-JSON.stringify(result.user)
-);
+localStorage.setItem("user", JSON.stringify(result.user));
 
 unlockForm();
 
-popup(result.message);
+popup(result.message || "Success");
 
 this.reset();
 
-}
-catch(err){
+loadRequestsFromDB();
+
+}catch(err){
 
 console.log(err);
-
-popup(
-"Server unavailable"
-);
+popup("Server unavailable. Please try again later.");
 
 }
 
-}
-);
+});
 
 // ======================
-// SUBMIT REQUEST
+// SUBMIT WASTE REQUEST
 // ======================
-document
-.getElementById("wasteForm")
-?.addEventListener(
-"submit",
-
-async function(e){
+document.getElementById("wasteForm")
+?.addEventListener("submit", async function(e){
 
 e.preventDefault();
 
 const data = {
-
-name:
-document.getElementById("fullName").value,
-
-location:
-document.getElementById("location").value,
-
-phone:
-document.getElementById("phone").value,
-
-email:
-document.getElementById("email").value,
-
-wasteType:
-document.getElementById("wasteType").value,
-
-additionalInfo:
-document.getElementById("additionalInfo").value
-
+name: document.getElementById("fullName").value,
+location: document.getElementById("location").value,
+phone: document.getElementById("phone").value,
+email: document.getElementById("email").value,
+wasteType: document.getElementById("wasteType").value,
+additionalInfo: document.getElementById("additionalInfo").value
 };
 
 try{
 
-const response =
-await fetch(
-"/api/requests",
-{
+const response = await fetch("/api/requests", {
 method:"POST",
-
 headers:{
 "Content-Type":"application/json"
 },
-
-body:
-JSON.stringify(data)
-
-}
-);
-
-const result =
-await response.json();
-
-if(!response.ok){
-
-popup(
-result.message
-);
-
-return;
-
-}
-
-requests.unshift({
-
-...data,
-status:"Pending"
-
+body:JSON.stringify(data)
 });
 
-render();
+const result = await response.json();
+
+if(!response.ok){
+popup(result.message || "Submission failed");
+return;
+}
+
+// reload from DB (IMPORTANT FIX)
+await loadRequestsFromDB();
 
 this.reset();
 
-popup(
-"Request submitted successfully"
-);
+popup("Request submitted successfully");
 
-}
-catch(err){
+}catch(err){
 
 console.log(err);
-
-popup(
-"Server connection failed"
-);
+popup("Server connection failed");
 
 }
 
-}
-);
+});
 
 // ======================
 // LOGOUT
@@ -270,14 +207,14 @@ popup(
 function logout(){
 
 localStorage.removeItem("user");
-
 localStorage.removeItem("admin");
 
-window.location.href =
-"index.html";
+window.location.href = "index.html";
 
 }
 
+// ======================
+// INIT
+// ======================
 unlockForm();
-
-render();
+loadRequestsFromDB();
