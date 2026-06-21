@@ -1,41 +1,80 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-<img src="Truck.jfif" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Truck.jfif" alt="Logo" style="width:200px;height:150px;">
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Admin Dashboard - Waste Requests</title>
-
-<div class="page-description">
-
-<p>Welcome to the Waste Collection Administration Dashboard.
-     This platform enables you to monitor and manage
-      waste collection requests submitted by users.</p>
-
-<p>Review incoming requests, approve or reject submissions, assign collection trucks,
- and track request progress to support efficient waste management operations.</p>
-
-<p>Use the actions provided in the request table
-     to coordinate collection activities and maintain service delivery standards. </p>
-
-</div>
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
 body{
-font-family:Arial;
-padding:20px;
+font-family:Arial,sans-serif;
+padding:15px;
+background:#f5f5f5;
+}
+
+/* HEADER */
+
+.logo-container{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:10px;
+margin-bottom:20px;
+}
+
+.logo-container img{
+width:120px;
+height:auto;
+max-width:100%;
+}
+
+/* DESCRIPTION */
+
+.page-description{
+background:white;
+padding:15px;
+border-radius:8px;
+margin-bottom:20px;
+line-height:1.6;
+}
+
+/* NAV */
+
+nav{
+margin-bottom:20px;
+}
+
+nav a{
+text-decoration:none;
+background:#0b8457;
+color:white;
+padding:10px 15px;
+border-radius:6px;
+display:inline-block;
+}
+
+/* TABLE */
+
+.table-wrapper{
+overflow-x:auto;
+background:white;
+border-radius:8px;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
+min-width:900px;
 }
 
 th,td{
@@ -50,37 +89,115 @@ color:white;
 }
 
 button{
-padding:6px 10px;
-margin-right:5px;
+padding:8px 12px;
+border:none;
+border-radius:5px;
 cursor:pointer;
+margin:3px;
 }
 
 .approve{
 background:#28a745;
 color:white;
-border:none;
 }
 
 .assign{
 background:#007bff;
 color:white;
-border:none;
 }
 
+button:hover{
+opacity:0.9;
+}
+
+/* FOOTER */
+
+footer{
+text-align:center;
+margin-top:30px;
+padding:20px;
+background:#0b8457;
+color:white;
+}
+
+/* MOBILE */
+
+@media (max-width:768px){
+
+body{
+padding:10px;
+}
+
+.logo-container{
+justify-content:center;
+}
+
+.logo-container img{
+width:80px;
+}
+
+.page-description{
+font-size:14px;
+}
+
+nav a{
+width:100%;
+text-align:center;
+}
+
+button{
+width:100%;
+margin-bottom:5px;
+}
+
+}
 
 </style>
 
 </head>
 
 <body>
+
+<div class="logo-container">
+
+<img src="Truck.jfif" alt="Truck">
+<img src="Logo.jpg" alt="Logo">
+<img src="Logo.jpg" alt="Logo">
+<img src="Logo.jpg" alt="Logo">
+<img src="Logo.jpg" alt="Logo">
+<img src="Truck.jfif" alt="Truck">
+
+</div>
+
+<div class="page-description">
+
+<p>
+Welcome to the Waste Collection Administration Dashboard.
+Monitor and manage waste collection requests submitted by users.
+</p>
+
+<br>
+
+<p>
+Approve or reject requests, assign trucks and track progress.
+</p>
+
+</div>
+
 <nav>
-    <A href="index.html" style = "text-align: right">Home</A>
+<a href="index.html">Home</a>
 </nav>
-<h2>Waste Collection Requests</h2>
+
+<h2 style="margin-bottom:15px;">
+Waste Collection Requests
+</h2>
+
+<div class="table-wrapper">
 
 <table>
 
 <thead>
+
 <tr>
 <th>ID</th>
 <th>Name</th>
@@ -91,21 +208,36 @@ border:none;
 <th>Truck Number</th>
 <th>Actions</th>
 </tr>
+
 </thead>
 
 <tbody id="requestTable">
 
 <tr>
-<td colspan="8">Loading requests...</td>
+<td colspan="8">
+Loading requests...
+</td>
 </tr>
 
 </tbody>
 
 </table>
 
-<script>
+</div>
 
-// LOAD REQUESTS
+<footer>
+
+<p>
+© 2026 Waste Collection System Rubaga
+</p>
+
+<p>
+Developed by VU Finalist 2026 Team
+</p>
+
+</footer>
+
+<script>
 
 async function loadRequests(){
 
@@ -114,31 +246,21 @@ document.getElementById("requestTable");
 
 try{
 
-table.innerHTML =
+table.innerHTML=
 `<tr><td colspan="8">Loading...</td></tr>`;
 
-const response =
+const response=
 await fetch("/api/requests");
 
-if(!response.ok){
-throw new Error("API failed");
-}
-
-const requests =
+const requests=
 await response.json();
 
-table.innerHTML = "";
+table.innerHTML="";
 
 if(requests.length===0){
 
-table.innerHTML =
-`
-<tr>
-<td colspan="8">
-No requests found
-</td>
-</tr>
-`;
+table.innerHTML=
+`<tr><td colspan="8">No requests found</td></tr>`;
 
 return;
 
@@ -146,7 +268,8 @@ return;
 
 requests.forEach(r=>{
 
-table.innerHTML += `
+table.innerHTML+=`
+
 <tr>
 
 <td>${r.id}</td>
@@ -178,62 +301,53 @@ Assign
 </td>
 
 </tr>
+
 `;
 
 });
 
-}
-catch(err){
-
-console.log(err);
+}catch{
 
 table.innerHTML=
-`
-<tr>
-<td colspan="8">
-Failed to load requests
-</td>
-</tr>
-`;
+`<tr><td colspan="8">Failed to load requests</td></tr>`;
 
 }
 
 }
 
-window.onload=loadRequests;
+async function approveRequest(id){
 
+await fetch(
+`/api/requests/approve/${id}`,
+{method:"PUT"}
+);
 
+loadRequests();
 
-// =====================
-// APPROVE REQUEST (FIXED)
-// =====================
-async function approveRequest(id) {
-  await fetch(`/api/requests/approve/${id}`, {
-    method: "PUT"
-  });
-
-  loadRequests();
 }
 
-// =====================
-// ASSIGN TRUCK (FIXED)
-// =====================
-async function assignTruck(id) {
-  const truck = prompt("Enter truck name / plate:");
-  if (!truck) return;
+async function assignTruck(id){
 
-  await fetch(`/api/requests/assign/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ truck })
-  });
+const truck =
+prompt("Enter truck number:");
 
-  loadRequests();
+if(!truck) return;
+
+await fetch(
+`/api/requests/assign/${id}`,
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({truck})
+}
+);
+
+loadRequests();
+
 }
 
-// =====================
 window.onload = loadRequests;
 
 </script>
