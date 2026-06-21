@@ -86,9 +86,26 @@ return;
 }
 
 localStorage.setItem("user", JSON.stringify(result.user));
-popup("Login successful");
 
-loadRequestsFromDB();
+if(result.message === "Account created"){
+popup("Account created successfully. You are now logged in.");
+}else{
+popup("Login successful");
+}
+
+
+function unlockForm(){
+const user = JSON.parse(localStorage.getItem("user"));
+if(!user) return;
+
+document.getElementById("request")?.classList.remove("hidden");
+
+const logged = document.getElementById("loggedUser");
+if(logged){
+logged.innerHTML = `Logged in as: ${user.name}`;
+}
+}
+
 }catch(err){
 console.log(err);
 popup("Server unavailable");
