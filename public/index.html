@@ -1,159 +1,262 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mobile Waste Collection System - Rubaga</title>
+<title>Waste Collection System - Rubaga</title>
 
 <style>
 
+/* =====================
+BASE RESET
+===================== */
 *{
 margin:0;
 padding:0;
 box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-html{
-scroll-behavior:smooth;
+font-family:system-ui, Arial, sans-serif;
 }
 
 body{
-background:#f4f7f8;
-color:#333;
+background:#f4f7fb;
+color:#222;
+line-height:1.6;
 }
 
+/* =====================
+HEADER / HERO
+===================== */
 header{
-background:#0a8754;
+background:linear-gradient(135deg,#0b8457,#066b43);
 color:white;
-padding:25px;
+padding:30px 20px;
 text-align:center;
 }
 
+header h1{
+font-size:24px;
+margin-top:10px;
+}
+
+header p{
+opacity:0.9;
+margin-top:5px;
+}
+
+.logo-row{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:10px;
+margin-bottom:15px;
+}
+
+.logo-row img{
+width:70px;
+height:auto;
+border-radius:8px;
+background:white;
+padding:3px;
+}
+
+/* =====================
+NAVIGATION
+===================== */
 nav{
 position:sticky;
 top:0;
-background:#066b43;
-padding:14px;
+z-index:1000;
+background:white;
 display:flex;
 justify-content:center;
-gap:20px;
 flex-wrap:wrap;
+gap:10px;
+padding:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
 nav a{
-color:white;
 text-decoration:none;
-font-weight:bold;
-padding:10px;
+color:#0b8457;
+font-weight:600;
+padding:8px 14px;
 border-radius:6px;
+transition:0.2s;
 }
 
 nav a:hover{
-background:#0a8754;
+background:#0b8457;
+color:white;
 }
 
-.content{
+/* =====================
+LAYOUT
+===================== */
+.container{
+max-width:1100px;
+margin:auto;
 padding:20px;
 }
 
 .card{
 background:white;
 padding:20px;
+border-radius:12px;
+box-shadow:0 4px 12px rgba(0,0,0,0.06);
 margin-bottom:20px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-h2,h3{
-color:#0a8754;
-margin-bottom:12px;
+/* =====================
+HEADINGS
+===================== */
+h2{
+color:#0b8457;
+margin-bottom:10px;
 }
 
-p,
-li{
-line-height:1.8;
+h3{
+color:#066b43;
+margin-bottom:8px;
 }
 
-ul{
-padding-left:25px;
+/* =====================
+TEXT
+===================== */
+p, li{
+font-size:15px;
 }
 
-input,
-select,
-textarea,
+/* =====================
+FORMS
+===================== */
+input, select, textarea{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:1px solid #ddd;
+border-radius:8px;
+font-size:14px;
+outline:none;
+}
+
+input:focus, select:focus, textarea:focus{
+border-color:#0b8457;
+}
+
+/* BUTTONS */
 button{
 width:100%;
 padding:12px;
 margin-top:10px;
-}
-
-button{
-background:#0a8754;
 border:none;
+border-radius:8px;
+background:#0b8457;
 color:white;
+font-size:15px;
 cursor:pointer;
+transition:0.2s;
 }
 
 button:hover{
-background:#087047;
+background:#066b43;
+}
+
+/* =====================
+TABLE
+===================== */
+.table-wrapper{
+overflow-x:auto;
 }
 
 table{
 width:100%;
 border-collapse:collapse;
+min-width:600px;
 }
 
-th,
-td{
-padding:10px;
-border:1px solid #ddd;
+th, td{
+padding:12px;
+border:1px solid #eee;
+text-align:left;
+font-size:14px;
 }
 
 th{
-background:#0a8754;
+background:#0b8457;
 color:white;
 }
 
+/* =====================
+STATUS BADGES
+===================== */
 .status-pending{
-color:orange;
+color:#ff9800;
+font-weight:bold;
 }
 
 .status-approved{
-color:green;
+color:#2e7d32;
+font-weight:bold;
 }
 
-.hidden{
-display:none;
-}
-
+/* =====================
+POPUP
+===================== */
 #popup{
 position:fixed;
 top:20px;
 right:20px;
-background:#0a8754;
+background:#0b8457;
 color:white;
-padding:12px 18px;
+padding:12px 16px;
 border-radius:8px;
 display:none;
-z-index:999;
+z-index:9999;
 }
 
-#loggedUser{
-margin-bottom:15px;
-font-weight:bold;
-color:#0a8754;
-}
-
+/* =====================
+FOOTER
+===================== */
 footer{
 background:#066b43;
 color:white;
-padding:15px;
 text-align:center;
+padding:20px;
+margin-top:30px;
+}
+
+/* =====================
+RESPONSIVE
+===================== */
+@media(max-width:768px){
+
+header h1{
+font-size:18px;
+}
+
+.logo-row img{
+width:55px;
+}
+
+nav{
+flex-direction:column;
+}
+
+nav a{
+width:100%;
+text-align:center;
+}
+
+.card{
+padding:15px;
+}
+
+button{
+font-size:14px;
+}
+
 }
 
 </style>
@@ -164,297 +267,112 @@ text-align:center;
 
 <div id="popup"></div>
 
+<!-- HERO -->
 <header>
-    <img src="Truck.jfif" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Logo.jpg" alt="Logo" style="width:200px;height:150px;">
-<img src="Truck.jfif" alt="Logo" style="width:200px;height:150px;">
 
-<h1>
-Mobile Waste Collection System - Rubaga Kampala
-</h1>
+<div class="logo-row">
+<img src="Truck.jfif" alt="logo">
+<img src="Logo.jpg" alt="logo">
+<img src="Logo.jpg" alt="logo">
+<img src="Logo.jpg" alt="logo">
+<img src="Truck.jfif" alt="logo">
+</div>
 
-<p>
-Request, Monitor & Track Waste Collection
-</p>
+<h1>Waste Collection System - Rubaga</h1>
+<p>Request • Track • Manage Waste Efficiently</p>
 
 </header>
 
-
+<!-- NAV -->
 <nav>
-
 <a href="#home">Home</a>
 <a href="#auth">Login</a>
 <a href="#request">Request</a>
 <a href="#monitoring">Monitoring</a>
-<a href="#contact">Contact </a>
-<a href="Admin-Login.html" >Admins Only</a>
-
-
-
+<a href="#contact">Contact</a>
+<a href="Admin-Login.html">Admin</a>
 </nav>
 
+<div class="container">
 
-<div class="content">
-
-<section id="home">
-
-<div class="card">
-
-<h2>
-Keep Rubaga Clean & Green
-</h2>
-
-<p>
-Residents and businesses can request waste collection and track services.
-</p>
-
-</div>
-
-<div class="card">
-
-
-
-<h3>About the System</h3>
-
-<p>
-The Digital Waste Collection Management and Monitoring System is designed to improve waste collection services through a simple and efficient digital platform.
-</p>
-
-<p>
-Residents can submit waste collection requests online, track request progress, and receive timely service updates.
-</p>
-
-<p>
-Administrators can approve requests, assign collection trucks, monitor operations, and manage service delivery to ensure cleaner communities.
-</p>
-
-</div>
-
-<div class="card">
-
-<h3>Services Offered</h3>
-
-<ul>
-<li>Online waste collection requests</li>
-<li>Request approval and management</li>
-<li>Truck assignment and scheduling</li>
-<li>Monitoring and reporting</li>
-<li>User and admin access</li>
-</ul>
-
-</div>
-
-
+<!-- HOME -->
+<section id="home" class="card">
+<h2>Welcome</h2>
+<p>A smart digital waste management system for residents and administrators.</p>
 </section>
 
-<!--login and sign up section-->
-
-<section id="auth">
-
-<div class="card">
-
-<h2>
-Login / Sign Up
-</h2>
+<!-- AUTH -->
+<section id="auth" class="card">
+<h2>Login / Register</h2>
 
 <form id="loginForm">
-
-<input
-id="userName"
-type="text"
-placeholder="Full Name"
-required>
-
-<input
-id="userEmail"
-type="email"
-placeholder="Email"
-required>
-
-<input
-id="userPassword"
-type="password"
-placeholder="Password"
-required>
-
-<button type="submit">
-
-Create Account / Login
-
-</button>
-
+<input type="text" placeholder="Full Name" required>
+<input type="email" placeholder="Email" required>
+<input type="password" placeholder="Password" required>
+<button type="submit">Login / Register</button>
 </form>
-
-</div>
 
 </section>
 
-
-
-
-
-<section
-id="request"
-class="hidden"
->
-
-<div class="card">
-
-<h2>
-Waste Request Form
-</h2>
-
-<div id="loggedUser"></div>
+<!-- REQUEST -->
+<section id="request" class="card hidden">
+<h2>Waste Request Form</h2>
 
 <form id="wasteForm">
+<input type="text" placeholder="Full Name" required>
+<input type="text" placeholder="Location" required>
+<input type="tel" placeholder="Phone" required>
+<input type="email" placeholder="Email">
 
-<input
-id="fullName"
-type="text"
-placeholder="Full Name"
-required>
-
-<input
-id="location"
-type="text"
-placeholder="Location"
-required>
-
-<input
-id="phone"
-type="tel"
-placeholder="Phone"
-required>
-
-<input
-id="email"
-type="email"
-placeholder="Email">
-
-<select
-id="wasteType"
-required>
-
-<option value="">
-Select Waste Type
-</option>
-
-<option>
-Plastic Waste
-</option>
-
-<option>
-Organic Waste
-</option>
-
-<option>
-e-Waste
-</option>
-
-<option>
-General Waste
-</option>
-
+<select required>
+<option value="">Select Waste Type</option>
+<option>Plastic</option>
+<option>Organic</option>
+<option>e-Waste</option>
+<option>General</option>
 </select>
 
-<textarea
-id="additionalInfo"
-placeholder="Additional Information">
-</textarea>
+<textarea placeholder="Additional Info"></textarea>
 
-<button type="submit">
-
-Submit Request
-
-</button>
-
+<button type="submit">Submit Request</button>
 </form>
-
-</div>
 
 </section>
 
+<!-- MONITORING -->
+<section id="monitoring" class="card">
+<h2>Submitted Requests</h2>
 
-
-
-<section id="monitoring">
-
-<div class="card">
-
-<h2>
-Submitted Requests
-</h2>
-
+<div class="table-wrapper">
 <table>
-
 <thead>
-
 <tr>
-
 <th>Name</th>
 <th>Location</th>
 <th>Phone</th>
 <th>Status</th>
-
 </tr>
-
 </thead>
 
 <tbody id="requestTable">
-
 <tr>
-
-<td colspan="4">
-No requests submitted
-</td>
-
+<td colspan="4">No requests yet</td>
 </tr>
-
 </tbody>
 
 </table>
-
 </div>
 
 </section>
 
-
-
-
-<section id="contact">
-
-<div class="card">
-
-<h2>
-Contact
-</h2>
-
-<p>
-WhatsApp: +256782705940
-</p>
-
-<p>
-Email: vu.finalist2026@gmail.com
-</p>
-
-</div>
-
+<!-- CONTACT -->
+<section id="contact" class="card">
+<h2>Contact</h2>
+<p>📞 +256 782 705 940</p>
+<p>📧 vu.finalist2026@gmail.com</p>
 </section>
 
 </div>
-<section>
-<div>
-    <button onclick="logout()">Logout</button>
-
-</div>
-
-</section>
-<br>  
-<br>
-<br>
 
 <footer>
 
@@ -463,13 +381,7 @@ Email: vu.finalist2026@gmail.com
 
 </footer>
 
-
 <script src="script.js"></script>
 
 </body>
-
 </html>
-
-
-
-
