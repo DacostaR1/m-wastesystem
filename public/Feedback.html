@@ -12,7 +12,6 @@ body {
     background: linear-gradient(135deg, #0a8754, #0f5f3c);
 }
 
-/* Container (same as login card) */
 .container {
     width: 100%;
     max-width: 850px;
@@ -20,101 +19,46 @@ body {
     background: rgba(255, 255, 255, 0.95);
     padding: 25px;
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    backdrop-filter: blur(6px);
 }
 
-/* Headings */
 h2 {
     text-align: center;
     color: #0a8754;
-    margin-bottom: 10px;
 }
 
-h3 {
-    color: #0a8754;
-    margin-top: 20px;
-}
-
-/* Section box */
 fieldset {
     border: 2px solid #0a8754;
-    border-radius: 10px;
     margin-bottom: 20px;
     padding: 15px;
 }
 
-legend {
-    color: #0a8754;
-    font-weight: bold;
-    padding: 0 8px;
-}
-
-/* Inputs */
-input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    margin: 6px 0 12px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    outline: none;
-}
-
-input:focus, textarea:focus {
-    border-color: #0a8754;
-    box-shadow: 0 0 5px rgba(10,135,84,0.4);
-}
-
-/* Options layout */
-.options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 10px;
-}
-
 .options label {
-    background: #e6f7ee;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 14px;
+    margin-right: 10px;
 }
 
-/* Button */
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 6px;
+}
+
 button {
     width: 100%;
     padding: 12px;
     background: #0a8754;
     color: white;
     border: none;
-    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
 }
 
-button:hover {
-    background: #076b42;
-}
-
-/* Popup (same style as login) */
 #popup {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: #ffffff;
+    background: white;
     color: #0a8754;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: 10px;
     display: none;
-    z-index: 9999;
-    font-weight: bold;
-}
-
-/* Responsive */
-@media(max-width: 768px){
-    .options{
-        flex-direction: column;
-    }
 }
 </style>
 </head>
@@ -124,126 +68,156 @@ button:hover {
 <div id="popup"></div>
 
 <div class="container">
+<h2>Waste Management System</h2>
 
-<h2>WASTE MANAGEMENT SYSTEM</h2>
-<p style="text-align:center;color:#444;">Data Collection Form</p>
-
-<form>
+<form id="feedbackForm">
 
 <!-- SECTION A -->
 <fieldset>
-<legend>Section A: Respondent Information</legend>
+<legend>Section A</legend>
 
 <label>Date</label>
-<input type="date">
+<input type="date" id="date">
 
-<label>Respondent Category</label>
+<label>Category</label>
 <div class="options">
-<label><input type="radio" name="cat"> Resident</label>
-<label><input type="radio" name="cat"> Waste Officer</label>
-<label><input type="radio" name="cat"> Administrator</label>
+<label><input type="radio" name="cat" value="Resident"> Resident</label>
+<label><input type="radio" name="cat" value="Waste Officer"> Waste Officer</label>
+<label><input type="radio" name="cat" value="Administrator"> Administrator</label>
 </div>
 
 <label>Gender</label>
 <div class="options">
-<label><input type="radio" name="gender"> Male</label>
-<label><input type="radio" name="gender"> Female</label>
-<label><input type="radio" name="gender"> Other</label>
+<label><input type="radio" name="gender" value="Male"> Male</label>
+<label><input type="radio" name="gender" value="Female"> Female</label>
+<label><input type="radio" name="gender" value="Other"> Other</label>
 </div>
 
-<label>Age Range</label>
+<label>Age</label>
 <div class="options">
-<label><input type="radio" name="age"> 18–25</label>
-<label><input type="radio" name="age"> 26–35</label>
-<label><input type="radio" name="age"> 36–45</label>
-<label><input type="radio" name="age"> 46+</label>
+<label><input type="radio" name="age" value="18-25"> 18–25</label>
+<label><input type="radio" name="age" value="26-35"> 26–35</label>
+<label><input type="radio" name="age" value="36-45"> 36–45</label>
+<label><input type="radio" name="age" value="46+"> 46+</label>
 </div>
 
-<label>Location / Zone</label>
-<input type="text" placeholder="Enter your location">
-
+<input type="text" id="location" placeholder="Location">
 </fieldset>
 
 <!-- SECTION B -->
 <fieldset>
-<legend>Section B: Waste Experience</legend>
+<legend>Section B</legend>
 
-<label>How often is waste collected?</label>
 <div class="options">
-<label><input type="radio" name="freq"> Daily</label>
-<label><input type="radio" name="freq"> Weekly</label>
-<label><input type="radio" name="freq"> Bi-weekly</label>
-<label><input type="radio" name="freq"> Rarely</label>
+<label><input type="radio" name="freq" value="Daily"> Daily</label>
+<label><input type="radio" name="freq" value="Weekly"> Weekly</label>
+<label><input type="radio" name="freq" value="Bi-weekly"> Bi-weekly</label>
+<label><input type="radio" name="freq" value="Rarely"> Rarely</label>
 </div>
 
-<label>Satisfaction Level</label>
 <div class="options">
-<label><input type="radio" name="sat"> Very Satisfied</label>
-<label><input type="radio" name="sat"> Satisfied</label>
-<label><input type="radio" name="sat"> Neutral</label>
-<label><input type="radio" name="sat"> Unsatisfied</label>
+<label><input type="radio" name="sat" value="Very Satisfied"> Very Satisfied</label>
+<label><input type="radio" name="sat" value="Satisfied"> Satisfied</label>
+<label><input type="radio" name="sat" value="Neutral"> Neutral</label>
+<label><input type="radio" name="sat" value="Unsatisfied"> Unsatisfied</label>
 </div>
 
-<label>Challenges Faced</label>
-<div class="options">
-<label><input type="checkbox"> Delayed collection</label>
-<label><input type="checkbox"> Poor communication</label>
-<label><input type="checkbox"> Missed pickups</label>
-<label><input type="checkbox"> High cost</label>
-</div>
+<label><input type="checkbox" id="delayed"> Delayed collection</label>
+<label><input type="checkbox" id="poor"> Poor communication</label>
+<label><input type="checkbox" id="missed"> Missed pickups</label>
+<label><input type="checkbox" id="cost"> High cost</label>
 
-<label>Other</label>
-<input type="text" placeholder="Specify">
-
+<input type="text" id="other" placeholder="Other">
 </fieldset>
 
 <!-- SECTION C -->
 <fieldset>
-<legend>Section C: Technology Use</legend>
+<legend>Section C</legend>
 
-<label>Do you use a smartphone?</label>
-<div class="options">
-<label><input type="radio" name="phone"> Yes</label>
-<label><input type="radio" name="phone"> No</label>
-</div>
+<label>Smartphone?</label>
+<input type="radio" name="phone" value="Yes"> Yes
+<input type="radio" name="phone" value="No"> No
 
-<label>Comfort using apps?</label>
-<div class="options">
-<label><input type="radio" name="app"> Yes</label>
-<label><input type="radio" name="app"> Somewhat</label>
-<label><input type="radio" name="app"> No</label>
-</div>
+<label>App comfort</label>
+<input type="radio" name="app" value="Yes"> Yes
+<input type="radio" name="app" value="Somewhat"> Somewhat
+<input type="radio" name="app" value="No"> No
 
-<label>Willing to use digital system?</label>
-<div class="options">
-<label><input type="radio" name="digital"> Yes</label>
-<label><input type="radio" name="digital"> Maybe</label>
-<label><input type="radio" name="digital"> No</label>
-</div>
-
+<label>Digital system?</label>
+<input type="radio" name="digital" value="Yes"> Yes
+<input type="radio" name="digital" value="Maybe"> Maybe
+<input type="radio" name="digital" value="No"> No
 </fieldset>
 
 <!-- SECTION D -->
 <fieldset>
-<legend>Section D: Feedback</legend>
+<legend>Section D</legend>
 
-<label>Useful Features</label>
-<div class="options">
-<label><input type="checkbox"> Requests</label>
-<label><input type="checkbox"> Monitoring</label>
+<label><input type="checkbox" id="req"> Requests</label>
+<label><input type="checkbox" id="mon"> Monitoring</label>
 
-</div>
-
-<label>Comments</label>
-<textarea rows="4" placeholder="Write your suggestions..."></textarea>
-
+<textarea id="comments" placeholder="Comments"></textarea>
 </fieldset>
 
-<button type="submit">Submit Form</button>
+<button type="submit">Submit</button>
 
 </form>
-
 </div>
+
+<script>
+function popup(msg){
+    const p = document.getElementById("popup");
+    p.innerText = msg;
+    p.style.display = "block";
+    setTimeout(()=> p.style.display="none", 2000);
+}
+
+document.getElementById("feedbackForm").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+
+    const data = {
+        collection_date: document.getElementById("date").value,
+        cat: document.querySelector('input[name="cat"]:checked')?.value,
+        gender: document.querySelector('input[name="gender"]:checked')?.value,
+        age: document.querySelector('input[name="age"]:checked')?.value,
+        location: document.getElementById("location").value,
+
+        freq: document.querySelector('input[name="freq"]:checked')?.value,
+        sat: document.querySelector('input[name="sat"]:checked')?.value,
+
+        delayed_collection: document.getElementById("delayed").checked,
+        poor_communication: document.getElementById("poor").checked,
+        missed_pickups: document.getElementById("missed").checked,
+        high_cost: document.getElementById("cost").checked,
+
+        other_challenge: document.getElementById("other").value,
+
+        phone: document.querySelector('input[name="phone"]:checked')?.value,
+        app: document.querySelector('input[name="app"]:checked')?.value,
+        digital: document.querySelector('input[name="digital"]:checked')?.value,
+
+        requests: document.getElementById("req").checked,
+        monitoring: document.getElementById("mon").checked,
+
+        comments: document.getElementById("comments").value
+    };
+
+    const res = await fetch("https://m-wastesystem.onrender.com/api/customer-feedback", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if(res.ok){
+        popup("Feedback submitted successfully");
+        e.target.reset();
+    } else {
+        popup(result.message || "Failed to submit feedback");
+    }
+});
+</script>
 
 </body>
 </html>
