@@ -129,9 +129,22 @@ button:hover {
 </div>
 
 <script>
-   const API_URL = "https://m-wastesystem.onrender.com";
 
-document.getElementById("staffForm").addEventListener("submit", async function(e){
+const API_URL = "https://m-wastesystem.onrender.com";
+
+function popup(msg, isError = false) {
+    const p = document.getElementById("popup");
+    p.innerText = msg;
+    p.style.background = isError ? "#ffdddd" : "#ffffff";
+    p.style.color = isError ? "#b00020" : "#0a8754";
+    p.style.display = "block";
+
+    setTimeout(() => {
+        p.style.display = "none";
+    }, 2500);
+}
+
+document.getElementById("staffForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
     const data = {
@@ -155,17 +168,22 @@ document.getElementById("staffForm").addEventListener("submit", async function(e
 
         const result = await res.json();
 
-        if (res.ok) {
-            popup("Feedback submitted successfully");
-            this.reset();
-        } else {
-            popup(result.message || "Submission failed");
+        if (!res.ok) {
+            popup(result.message || "Submission failed", true);
+            return;
         }
 
+        popup("Feedback submitted successfully ✅");
+
+        this.reset();
+
     } catch (err) {
-        popup("Server not reachable");
+        console.error(err);
+        popup("Server not reachable ❌", true);
     }
 });
+
+
 </script>
 
 </body>
