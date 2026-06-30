@@ -9,120 +9,295 @@
 
 <style>
 
-/* RESET */
+/* ===========================
+   RESET
+=========================== */
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 body{
-background:#f4f6f9;
+    background:linear-gradient(135deg,#0a8754,#0f5f3c);
+    min-height:100vh;
 }
 
-/* LAYOUT */
+/* ===========================
+   CONTAINER
+=========================== */
 .container{
-max-width:1200px;
-margin:auto;
-padding:20px;
+    width:95%;
+    max-width:1200px;
+    margin:30px auto;
+    background:rgba(255,255,255,.97);
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 8px 25px rgba(0,0,0,.2);
 }
 
-/* STATS */
+/* ===========================
+   HEADINGS
+=========================== */
+h2{
+    text-align:center;
+    color:#0a8754;
+    margin-bottom:10px;
+}
+
+.container p{
+    text-align:center;
+    color:#555;
+    margin-bottom:15px;
+    line-height:1.6;
+}
+
+/* ===========================
+   HOME BUTTON
+=========================== */
+.container a{
+    text-decoration:none;
+}
+
+.container>a{
+    display:inline-block;
+    background:#dc3545;
+    color:#fff;
+    padding:10px 18px;
+    border-radius:6px;
+    margin-bottom:20px;
+    transition:.3s;
+}
+
+.container>a:hover{
+    background:#b52a37;
+}
+
+/* ===========================
+   STATISTICS
+=========================== */
 .stats{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-margin-bottom:20px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:25px;
 }
 
 .box{
-background:white;
-padding:15px;
-border-radius:10px;
-text-align:center;
-font-weight:bold;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
+    background:#0a8754;
+    color:white;
+    padding:20px;
+    text-align:center;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:bold;
+    box-shadow:0 3px 8px rgba(0,0,0,.2);
 }
 
-/* GRID */
+/* ===========================
+   REQUEST GRID
+=========================== */
 .grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:15px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:20px;
 }
 
-/* CARD */
+/* ===========================
+   REQUEST CARD
+=========================== */
 .card{
-background:white;
-padding:15px;
-border-radius:10px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-border-left:5px solid #0b8457;
+    background:#fff;
+    border-left:6px solid #0a8754;
+    border-radius:10px;
+    padding:18px;
+    box-shadow:0 3px 10px rgba(0,0,0,.12);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
 }
 
 .card p{
-margin:6px 0;
-font-size:14px;
+    text-align:left;
+    margin:8px 0;
+    color:#333;
+    font-size:14px;
 }
 
-/* STATUS */
+/* ===========================
+   STATUS BADGES
+=========================== */
 .status{
-display:inline-block;
-padding:4px 10px;
-border-radius:20px;
-font-size:12px;
-color:white;
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:20px;
+    color:white;
+    font-size:12px;
+    font-weight:bold;
 }
 
-.pending{background:#f0ad4e;}
-.approved{background:#28a745;}
-.rejected{background:#dc3545;}
-.assigned{background:#007bff;}
+.pending{
+    background:#f0ad4e;
+}
 
-/* BUTTONS */
+.approved{
+    background:#28a745;
+}
+
+.rejected{
+    background:#dc3545;
+}
+
+.assigned{
+    background:#007bff;
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
 .actions{
-display:flex;
-gap:8px;
-margin-top:10px;
-flex-wrap:wrap;
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+    flex-wrap:wrap;
 }
 
 button{
-flex:1;
-padding:8px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-font-size:13px;
+    flex:1;
+    border:none;
+    padding:10px;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    transition:.3s;
 }
 
-.approve{background:#28a745;color:white;}
-.reject{background:#dc3545;color:white;}
-.assign{background:#007bff;color:white;}
+.approve{
+    background:#28a745;
+}
+
+.reject{
+    background:#dc3545;
+}
+
+.assign{
+    background:#007bff;
+}
 
 button:hover{
-opacity:0.85;
+    opacity:.9;
+    transform:scale(1.02);
 }
 
-/* MOBILE */
-@media(max-width:768px){
+/* ===========================
+   FOOTER
+=========================== */
+footer{
+    background:#066b43;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:30px;
+}
+
+footer p{
+    margin:5px 0;
+}
+
+footer a{
+    color:#fff;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+footer a:hover{
+    text-decoration:underline;
+}
+
+/* ===========================
+   TABLETS
+=========================== */
+@media (max-width:992px){
 
 .stats{
-grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2,1fr);
 }
 
 }
 
-footer{
-background:#066b43;
-color:white;
-text-align:center;
-padding:20px;
-margin-top:30px;
+/* ===========================
+   MOBILE
+=========================== */
+@media (max-width:768px){
+
+.container{
+    width:98%;
+    padding:15px;
+    margin:15px auto;
 }
 
+.stats{
+    grid-template-columns:1fr;
+}
 
+.grid{
+    grid-template-columns:1fr;
+}
+
+.box{
+    font-size:16px;
+}
+
+.actions{
+    flex-direction:column;
+}
+
+button{
+    width:100%;
+}
+
+h2{
+    font-size:24px;
+}
+
+.container p{
+    font-size:14px;
+}
+
+}
+
+/* ===========================
+   SMALL PHONES
+=========================== */
+@media (max-width:480px){
+
+.container{
+    padding:12px;
+}
+
+.card{
+    padding:15px;
+}
+
+.card p{
+    font-size:13px;
+}
+
+.box{
+    padding:15px;
+    font-size:15px;
+}
+
+button{
+    font-size:13px;
+}
+
+}
 </style>
 
 </head>
