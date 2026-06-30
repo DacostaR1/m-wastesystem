@@ -1,6 +1,22 @@
+# dependencies
+node_modules/
 
-
-node_modules
+# environment variables
 .env
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# executables
 *.exe
 *.msi
+
+# production builds (if any frontend build later)
+dist/
+build/

@@ -23,29 +23,40 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// =====================
-// MYSQL CONNECTION (FIXED FOR TIDB / RENDER)
-// =====================
+
+// MYSQL CONNECTION 
+
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: Number(process.env.DB_PORT) || 4000,
+  port: Number(process.env.DB_PORT || 3306),
 
-  ssl: {
-    rejectUnauthorized: false
-  },
+  ssl: process.env.NODE_ENV === "production"
+    ? { rejectUnauthorized: false }
+    : undefined,
 
   connectTimeout: 20000
 });
 
 db.connect((err) => {
   if (err) {
-    console.log("Database not connected:", err.message);
+    console.error("MySQL Database connection failed:", err.code, err.message);
     return;
   }
   console.log("MySQL Database connected successfully");
+});
+
+
+//Testing the connection
+
+db.query("SELECT 1", (err, result) => {
+  if (err) {
+    console.error(" Database test Failed:", err);
+  } else {
+    console.log(" Database Test has passed:", result);
+  }
 });
 
 // =====================
@@ -335,9 +346,66 @@ app.post("/api/requests", (req, res) => {
   );
 });
 
-// =====================
+//Staff Feedback route to the MySql
+
+
+app.post("/api/staff-feedback", (req, res) => {
+
+  const {
+    full_name,
+    role,
+    email,
+    phone,
+    department,
+    work_location,
+    comments
+  } = req.body;
+
+ 
+  if (!full_name || !role || !work_location || !comments) {
+    return res.status(400).json({
+      message: "Missing required fields"
+    });
+  }
+
+  const sql = `
+    INSERT INTO staff_feedback
+    (full_name, role, email, phone, department, work_location, comments)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(
+    sql,
+    [
+      full_name,
+      role,
+      email || null,
+      phone || null,
+      department || null,
+      work_location,
+      comments
+    ],
+    (err, result) => {
+
+      if (err) {
+        console.error("Failed to save your feedback:", err.code, err.message);
+        return res.status(500).json({
+          message: "Database error"
+        });
+      }
+
+      res.status(201).json({
+        message: "Feedback saved successfully",
+        id: result.insertId
+      });
+    }
+  );
+});
+
+
 // GET REQUESTS (USER + ADMIN)
-// =====================
+
+
 app.get("/api/requests", (req, res) => {
   const email = req.query.email;
 
