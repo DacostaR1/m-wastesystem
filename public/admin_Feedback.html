@@ -173,13 +173,13 @@ document.getElementById("staffForm").addEventListener("submit", async function(e
             return;
         }
 
-        popup("Feedback submitted successfully ✅");
+        popup("Your Feedback is submitted successfully");
 
         this.reset();
 
     } catch (err) {
         console.error(err);
-        popup("Server not reachable ❌", true);
+        popup("Server not reachable ", true);
     }
 });
 
