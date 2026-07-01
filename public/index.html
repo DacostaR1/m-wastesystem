@@ -26,6 +26,13 @@ line-height:1.6;
 }
 
 /* =====================
+HIDDEN CLASS (FIXED)
+===================== */
+.hidden {
+display: none;
+}
+
+/* =====================
 HEADER / HERO
 ===================== */
 header{
@@ -49,16 +56,15 @@ margin-top:5px;
 display:flex;
 justify-content:center;
 flex-wrap:wrap;
-gap:10px;
 margin-bottom:15px;
 }
 
 .logo-row img{
-width:70px;
+width:180px;
 height:auto;
 border-radius:8px;
 background:white;
-padding:3px;
+padding:5px;
 }
 
 /* =====================
@@ -91,13 +97,27 @@ background:#0b8457;
 color:white;
 }
 
+/* Logout button in nav */
+#logoutBtn{
+background:#0b8457;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+}
+
+#logoutBtn:hover{
+background:#066b43;
+}
+
 /* =====================
 LAYOUT
 ===================== */
 .container{
 max-width:1100px;
 margin:auto;
-padding:20px;
+padding:30px 15px;
 }
 
 .card{
@@ -189,7 +209,7 @@ color:white;
 }
 
 /* =====================
-STATUS BADGES
+STATUS
 ===================== */
 .status-pending{
 color:#ff9800;
@@ -230,7 +250,6 @@ margin-top:30px;
 /* =====================
 RESPONSIVE
 ===================== */
-
 @media(max-width:768px){
 
 nav{
@@ -240,13 +259,10 @@ overflow-x:auto;
 white-space:nowrap;
 -webkit-overflow-scrolling:touch;
 gap:8px;
-padding:10px;
 }
 
 nav a{
 flex:0 0 auto;
-display:inline-block;
-padding:8px 14px;
 font-size:14px;
 }
 
@@ -264,11 +280,11 @@ font-size:14px;
 <header>
 
 <div class="logo-row">
-<img src="Logo.jpg" alt="logo" style="width:250px;height:auto;border-radius:8px;background:white;padding:3px;">
+<img src="Logo.jpg" alt="logo">
 </div>
 
-<h1> Mobile Waste Collection System - Rubaga</h1>
-<p>Request • Track • Manage Waste hassle free </p>
+<h1>Mobile Waste Collection System - Rubaga</h1>
+<p>Request • Track • Manage Waste hassle free</p>
 
 </header>
 
@@ -278,42 +294,31 @@ font-size:14px;
 <a href="#auth">Login</a>
 <a href="#request">Request</a>
 <a href="#monitoring">Monitoring</a>
-<a href="#contact">Contact</a>
 <a href="Admin-Login.html">Admins only</a>
+
+<button id="logoutBtn" onclick="logout()" style="display:none;">
+Logout
+</button>
 </nav>
 
 <div class="container">
 
 <!-- HOME -->
 <section id="home" class="card">
-<h2>Welcome to the Mobile Waste Collection Platform</h2>
-<p>A smart digital waste management system for residents and administrators.</p>
-<p>
-Users can easily submit requests, track their status in real time, 
-and receive updates when a truck has been assigned or a request has been completed.
-</p>
-
-<p>
-Administrators benefit from a centralized dashboard that allows them
- to approve, reject, assign trucks, and monitor overall waste collection operations efficiently.
-</p>
-
+<h2>Welcome</h2>
+<p>Smart waste management system for residents and administrators.</p>
 </section>
 
 <!-- AUTH -->
 <section id="auth" class="card">
 <h2>Login / Register</h2>
 <p id="loggedUser"></p>
+
 <form id="loginForm">
-
 <input id="userName" type="text" placeholder="Full Name" required>
-
 <input id="userEmail" type="email" placeholder="Email" required>
-
 <input id="userPassword" type="password" placeholder="Password" required>
-
 <button type="submit">Login / Register</button>
-
 </form>
 
 </section>
@@ -323,15 +328,10 @@ Administrators benefit from a centralized dashboard that allows them
 <h2>Waste Request Form</h2>
 
 <form id="wasteForm">
-
 <input id="fullName" type="text" placeholder="Full Name" required>
-
 <input id="location" type="text" placeholder="Location" required>
-
 <input id="phone" type="tel" placeholder="Phone" required>
-
 <input id="email" type="email" placeholder="Email">
-
 <select id="wasteType" required>
 <option value="">Select Waste Type</option>
 <option>Plastic</option>
@@ -339,11 +339,8 @@ Administrators benefit from a centralized dashboard that allows them
 <option>e-Waste</option>
 <option>General</option>
 </select>
-
 <textarea id="additionalInfo" placeholder="Additional Info"></textarea>
-
 <button type="submit">Submit Request</button>
-
 </form>
 
 </section>
@@ -376,7 +373,7 @@ Administrators benefit from a centralized dashboard that allows them
 
 <!-- CONTACT -->
 <section id="contact" class="card">
-<h2>Contact Us </h2>
+<h2>Contact Us</h2>
 <p>📞 +256 782 705 940</p>
 <p>📞 +256 763 623 905</p>
 <p>📞 +256 777 742 240</p>
@@ -384,15 +381,10 @@ Administrators benefit from a centralized dashboard that allows them
 <p>📧 vu.finalist2026@yopmail.com</p>
 </section>
 
-<a href="customer_feedback.html" style="text-align: right;">Click here to share feedback</a>
-
 </div>
 
 <footer>
-
-<p>© 2026 Waste Collection System Rubaga | Developed by VU Finalist 2026 Team </p>
-<p>© 2026 Nabugabo Updeal Joint Ventures | All Rights Reserved.</p>
-
+<p>© 2026 Waste Collection System Rubaga</p>
 </footer>
 
 <script src="script.js"></script>

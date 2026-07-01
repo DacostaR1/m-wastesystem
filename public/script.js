@@ -22,7 +22,13 @@ function popup(msg) {
 // ======================
 async function loadRequestsFromDB() {
   try {
-    const res = await fetch(`${API_BASE}/api/requests`);
+
+    const user = JSON.parse(sessionStorage.getItem("user"));
+
+    // If no user, don't load private requests
+    if (!user) return;
+
+    const res = await fetch(`${API_BASE}/api/requests?email=${user.email}`);
 
     if (!res.ok) throw new Error("Failed to fetch");
 
@@ -90,15 +96,15 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
       return;
     }
 
-    // SAVE USER
-    localStorage.setItem("user", JSON.stringify(result.user));
+    // SAVE USER (SESSION ONLY)
+    sessionStorage.setItem("user", JSON.stringify(result.user));
 
-    // SWITCH UI
     unlockForm();
 
     popup(result.message || "Login successful");
 
     e.target.reset();
+
     loadRequestsFromDB();
 
   } catch (err) {
@@ -114,6 +120,13 @@ document.getElementById("wasteForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   try {
+
+    const user = JSON.parse(sessionStorage.getItem("user"));
+    if (!user) {
+      popup("Please login first");
+      return;
+    }
+
     const name = document.getElementById("fullName")?.value;
     const location = document.getElementById("location")?.value;
     const phone = document.getElementById("phone")?.value;
@@ -133,7 +146,7 @@ document.getElementById("wasteForm")?.addEventListener("submit", async (e) => {
         name,
         location,
         phone,
-        email,
+        email: email || user.email,
         wasteType,
         additionalInfo
       })
@@ -149,6 +162,7 @@ document.getElementById("wasteForm")?.addEventListener("submit", async (e) => {
     popup("Request submitted");
 
     e.target.reset();
+
     loadRequestsFromDB();
 
   } catch (err) {
@@ -158,17 +172,17 @@ document.getElementById("wasteForm")?.addEventListener("submit", async (e) => {
 });
 
 // ======================
-// FIXED LOGIN UI SWITCH
+// UI LOGIN STATE
 // ======================
 function unlockForm() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(sessionStorage.getItem("user"));
   if (!user) return;
 
   const auth = document.getElementById("auth");
   const request = document.getElementById("request");
   const loggedUser = document.getElementById("loggedUser");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-  // FORCE consistent UI state
   if (auth) auth.style.display = "none";
 
   if (request) {
@@ -179,21 +193,45 @@ function unlockForm() {
   if (loggedUser) {
     loggedUser.innerText = `Logged in as: ${user.name}`;
   }
+
+  if (logoutBtn) {
+    logoutBtn.style.display = "inline-block";
+  }
 }
 
 // ======================
 // LOGOUT
 // ======================
 function logout() {
-  localStorage.removeItem("user");
-  location.reload();
+
+  sessionStorage.removeItem("user");
+
+  const auth = document.getElementById("auth");
+  const request = document.getElementById("request");
+  const loggedUser = document.getElementById("loggedUser");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  if (auth) auth.style.display = "block";
+
+  if (request) request.classList.add("hidden");
+
+  if (loggedUser) loggedUser.innerText = "";
+
+  if (logoutBtn) logoutBtn.style.display = "none";
+
+  requests = [];
+  render();
+
+  popup("Logged out successfully");
 }
 
 // ======================
 // INIT
 // ======================
 window.addEventListener("load", () => {
-  const user = JSON.parse(localStorage.getItem("user"));
+
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  const logoutBtn = document.getElementById("logoutBtn");
 
   if (user) {
     unlockForm();
@@ -203,6 +241,8 @@ window.addEventListener("load", () => {
 
     if (auth) auth.style.display = "block";
     if (request) request.classList.add("hidden");
+
+    if (logoutBtn) logoutBtn.style.display = "none";
   }
 
   loadRequestsFromDB();
