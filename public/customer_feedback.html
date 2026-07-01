@@ -100,9 +100,9 @@ button:hover {
 
 <div class="container">
 
-    <nav>
-    <a href="index.html" style="text-align: end;">Home</a>
-</nav>
+    
+    <a href="index.html" style="color: #0a8754;">Home</a>
+
    
 
 <h2>Customer Feedback Form</h2>
@@ -223,8 +223,9 @@ button:hover {
 
 </div>
 
+
 <script>
-const API = "https://m-wastesystem.onrender.com/api/customer-feedback";
+const API = "https://m-wastesystem-1.onrender.com/api/customer-feedback";
 
 function popup(msg){
     const p = document.getElementById("popup");
@@ -237,30 +238,30 @@ document.getElementById("feedbackForm").addEventListener("submit", async (e) => 
     e.preventDefault();
 
     const data = {
-        collection_date: document.getElementById("collection_date").value,
-        respondent_category: document.querySelector('input[name="cat"]:checked')?.value,
-        gender: document.querySelector('input[name="gender"]:checked')?.value,
-        age_range: document.querySelector('input[name="age"]:checked')?.value,
-        location_zone: document.getElementById("location_zone").value,
+        collection_date: document.getElementById("collection_date").value || null,
+        cat: document.querySelector('input[name="cat"]:checked')?.value || null,
+        gender: document.querySelector('input[name="gender"]:checked')?.value || null,
+        age: document.querySelector('input[name="age"]:checked')?.value || null,
+        location: document.getElementById("location_zone").value || null,
 
-        waste_frequency: document.querySelector('input[name="freq"]:checked')?.value,
-        satisfaction_level: document.querySelector('input[name="sat"]:checked')?.value,
+        freq: document.querySelector('input[name="freq"]:checked')?.value || null,
+        sat: document.querySelector('input[name="sat"]:checked')?.value || null,
 
-        delayed_collection: document.getElementById("delayed_collection").checked ? 1 : 0,
-        poor_communication: document.getElementById("poor_communication").checked ? 1 : 0,
-        missed_pickups: document.getElementById("missed_pickups").checked ? 1 : 0,
-        high_cost: document.getElementById("high_cost").checked ? 1 : 0,
+        delayed_collection: document.getElementById("delayed_collection").checked,
+        poor_communication: document.getElementById("poor_communication").checked,
+        missed_pickups: document.getElementById("missed_pickups").checked,
+        high_cost: document.getElementById("high_cost").checked,
 
-        other_challenge: document.getElementById("other_challenge").value,
+        other_challenge: document.getElementById("other_challenge").value || null,
 
-        has_smartphone: document.querySelector('input[name="smartphone"]:checked')?.value,
-        app_comfort: document.querySelector('input[name="app"]:checked')?.value,
-        willing_digital_system: document.querySelector('input[name="digital"]:checked')?.value,
+        phone: document.querySelector('input[name="smartphone"]:checked')?.value || null,
+        app: document.querySelector('input[name="app"]:checked')?.value || null,
+        digital: document.querySelector('input[name="digital"]:checked')?.value || null,
 
-        feature_requests: document.getElementById("feature_requests").checked ? 1 : 0,
-        feature_monitoring: document.getElementById("feature_monitoring").checked ? 1 : 0,
+        requests: document.getElementById("feature_requests").checked,
+        monitoring: document.getElementById("feature_monitoring").checked,
 
-        comments: document.getElementById("comments").value
+        comments: document.getElementById("comments").value || null
     };
 
     try {

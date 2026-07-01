@@ -406,6 +406,7 @@ app.post("/api/staff-feedback", (req, res) => {
 //Save customer feedback to database
 
 app.post("/api/customer-feedback", (req, res) => {
+
   const {
     collection_date,
     cat,
@@ -461,47 +462,42 @@ app.post("/api/customer-feedback", (req, res) => {
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `;
 
-  db.query(
-    sql,
-    [
-      collection_date,
-      cat,
-      gender,
-      age,
-      location,
+  db.query(sql, [
+    collection_date,
+    cat,
+    gender,
+    age,
+    location,
 
-      freq,
-      sat,
+    freq,
+    sat,
 
-      delayed_collection ? 1 : 0,
-      poor_communication ? 1 : 0,
-      missed_pickups ? 1 : 0,
-      high_cost ? 1 : 0,
-      other_challenge || null,
+    delayed_collection ? 1 : 0,
+    poor_communication ? 1 : 0,
+    missed_pickups ? 1 : 0,
+    high_cost ? 1 : 0,
+    other_challenge,
 
-      phone,
-      app,
-      digital,
+    phone,
+    app,
+    digital,
 
-      requests ? 1 : 0,
-      monitoring ? 1 : 0,
+    requests ? 1 : 0,
+    monitoring ? 1 : 0,
 
-      comments
-    ],
-    (err, result) => {
-      if (err) {
-        console.error("DB ERROR:", err);
-        return res.status(500).json({
-          message: "Failed to save your feedback"
-        });
-      }
+    comments
+  ], (err, result) => {
 
-      res.status(201).json({
-        message: "Your Feedback has been submitted successfully",
-        id: result.insertId
-      });
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Insert failed" });
     }
-  );
+
+    res.json({
+      message: "Feedback saved successfully",
+      id: result.insertId
+    });
+  });
 });
 
 // GET REQUESTS (USER + ADMIN)
