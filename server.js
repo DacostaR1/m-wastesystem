@@ -525,7 +525,7 @@ app.get("/api/requests", (req, res) => {
   }
 
   db.query(
-    "SELECT * FROM requests ORDER BY id ASC",
+    "SELECT * FROM requests ORDER BY id desc",
     (err, rows) => {
       if (err) {
         return res.status(500).json([]);
