@@ -9,9 +9,7 @@
 
 <style>
 
-/* ===========================
-   RESET
-=========================== */
+
 *{
     margin:0;
     padding:0;
@@ -24,9 +22,8 @@ body{
     min-height:100vh;
 }
 
-/* ===========================
-   CONTAINER
-=========================== */
+/* CONTAINER css  */
+
 .container{
     width:95%;
     max-width:1200px;
@@ -37,9 +34,8 @@ body{
     box-shadow:0 8px 25px rgba(0,0,0,.2);
 }
 
-/* ===========================
-   HEADINGS
-=========================== */
+/*  HEADINGS css   */
+
 h2{
     text-align:center;
     color:#0a8754;
@@ -53,16 +49,15 @@ h2{
     line-height:1.6;
 }
 
-/* ===========================
-   HOME BUTTON
-=========================== */
+/*  HOME BUTTON css    */
+
 .container a{
     text-decoration:none;
 }
 
 .container>a{
     display:inline-block;
-    background:#dc3545;
+    background:#5d54e5;
     color:#fff;
     padding:10px 18px;
     border-radius:6px;
@@ -74,9 +69,9 @@ h2{
     background:#b52a37;
 }
 
-/* ===========================
-   STATISTICS
-=========================== */
+/* STATISTICS (Dashboard) css   */
+
+
 .stats{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -95,18 +90,16 @@ h2{
     box-shadow:0 3px 8px rgba(0,0,0,.2);
 }
 
-/* ===========================
-   REQUEST GRID
-=========================== */
+/* REQUEST GRID css    */
+
 .grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
     gap:20px;
 }
 
-/* ===========================
-   REQUEST CARD
-=========================== */
+/*  REQUEST CARD     */
+
 .card{
     background:#fff;
     border-left:6px solid #0a8754;
@@ -128,9 +121,8 @@ h2{
     font-size:14px;
 }
 
-/* ===========================
-   STATUS BADGES
-=========================== */
+/*   STATUS BADGES       */
+
 .status{
     display:inline-block;
     padding:6px 14px;
@@ -156,9 +148,9 @@ h2{
     background:#007bff;
 }
 
-/* ===========================
-   BUTTONS
-=========================== */
+/*    BUTTONS     */
+
+
 .actions{
     display:flex;
     gap:10px;
@@ -194,9 +186,7 @@ button:hover{
     transform:scale(1.02);
 }
 
-/* ===========================
-   FOOTER
-=========================== */
+/*  FOOTER    */
 footer{
     background:#066b43;
     color:white;
@@ -219,9 +209,8 @@ footer a:hover{
     text-decoration:underline;
 }
 
-/* ===========================
-   TABLETS
-=========================== */
+/*  TABLET devices   */
+
 @media (max-width:992px){
 
 .stats{
@@ -230,9 +219,8 @@ footer a:hover{
 
 }
 
-/* ===========================
-   MOBILE
-=========================== */
+/*   MOBILE /smartphones    */
+
 @media (max-width:768px){
 
 .container{
@@ -271,9 +259,8 @@ h2{
 
 }
 
-/* ===========================
-   SMALL PHONES
-=========================== */
+/* SMALL PHONES  */
+
 @media (max-width:480px){
 
 .container{
@@ -345,9 +332,9 @@ document.getElementById("stats").innerHTML = `
 `;
 }
 
-// =====================
+
 // LOAD REQUESTS
-// =====================
+
 async function loadRequests(){
 
 const grid = document.getElementById("grid");
@@ -424,9 +411,9 @@ grid.innerHTML = "Failed to load requests";
 
 }
 
-// =====================
-// APPROVE
-// =====================
+// 
+// APPROVE 
+//
 async function approveRequest(id){
 
 await fetch(`/api/requests/approve/${id}`, {
@@ -442,9 +429,10 @@ loadRequests();
 loadStats();
 }
 
-// =====================
+// 
 // REJECT
-// =====================
+// 
+
 async function rejectRequest(id){
 
 let reason = prompt("Enter rejection reason:");
@@ -463,9 +451,9 @@ loadRequests();
 loadStats();
 }
 
-// =====================
+// 
 // ASSIGN TRUCK
-// =====================
+// 
 async function assignTruck(id){
 
 let truck = prompt("Enter truck number:");

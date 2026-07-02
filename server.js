@@ -531,9 +531,9 @@ app.get("/api/requests", (req, res) => {
   );
 });
 
-// =====================
+// 
 // APPROVE
-// =====================
+// 
 app.put("/api/requests/approve/:id", (req, res) => {
 
 const { admin, remarks } = req.body;
@@ -551,9 +551,9 @@ res.json({ message: "Approved" });
 });
 });
 
-// =====================
+// 
 // REJECT
-// =====================
+// 
 app.put("/api/requests/reject/:id", (req, res) => {
 
 const { reason, admin } = req.body;
@@ -572,9 +572,9 @@ res.json({ message: "Rejected" });
 });
 
 
-// =====================
+// 
 // ASSIGN TRUCK
-// =====================
+// 
 app.put("/api/requests/assign/:id", (req, res) => {
   const { truck } = req.body;
 
@@ -588,9 +588,9 @@ app.put("/api/requests/assign/:id", (req, res) => {
   );
 });
 
-// =====================
+// 
 // UPDATE FLEXIBLE
-// =====================
+//
 app.put("/api/requests/:id", (req, res) => {
   const { status, truck } = req.body;
 
@@ -629,9 +629,9 @@ app.put("/api/requests/:id", (req, res) => {
   });
 });
 
-// =====================
-// START SERVER (RENDER SAFE)
-// =====================
+// 
+// START SERVER
+// 
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
