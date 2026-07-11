@@ -8,6 +8,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// Show the logged admin Name
+
+
+function getAdminName() {
+
+    const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
+
+    return admin.username || "Administrator";
+}
+
 // LOAD ALL REQUESTS
 
 
@@ -129,8 +139,7 @@ async function loadRequests() {
 async function updateRequest(id, status) {
 
  const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
-const adminName = admin.username || "Administrator";
-
+const adminName = getAdminName();
     try {
 
         const response = await fetch(`/api/admin/requests/${id}`, {
@@ -175,6 +184,8 @@ const adminName = admin.username || "Administrator";
 
 
 async function rejectRequest(id) {
+
+    const adminName = getAdminName();
 
     const reason = prompt("Enter rejection reason:");
 
@@ -234,6 +245,8 @@ body: JSON.stringify({
 // =====================================
 
 async function assignTruck(id) {
+
+    const adminName = getAdminName();
 
     const input = document.getElementById(`truck-${id}`);
 

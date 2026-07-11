@@ -27,39 +27,53 @@ app.get("/", (req, res) => {
 
 
 // MYSQL CONNECTION 
+const mysql = require("mysql2");
+const db = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: Number(process.env.DB_PORT || 3306),
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: Number(process.env.DB_PORT || 3306),
+    ssl: process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: false }
+        : undefined,
 
-  ssl: process.env.NODE_ENV === "production"
-    ? { rejectUnauthorized: false }
-    : undefined,
-
-  connectTimeout: 20000
+    waitForConnections: true,
+    connectionLimit: 10,
+    maxIdle: 10,
+    idleTimeout: 60000,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+    connectTimeout: 20000
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error("MySQL Database connection failed:", err.code, err.message);
-    return;
-  }
-  console.log("MySQL Database connected successfully");
+// Test connection
+db.getConnection((err, connection) => {
+
+    if (err) {
+        console.error("Database connection failed");
+        console.error(err);
+        return;
+    }
+
+    console.log("MySQL Database connected successfully");
+
+    connection.query("SELECT 1", (err, rows) => {
+
+        if (err) {
+            console.error("Database test failed", err);
+        } else {
+            console.log("Database Test passed:", rows);
+        }
+
+        connection.release();
+    });
+
 });
 
-
-//Testing the connection
-
-db.query("SELECT 1", (err, result) => {
-  if (err) {
-    console.error(" Database test Failed:", err);
-  } else {
-    console.log(" Database Test has passed:", result);
-  }
-});
+module.exports = db;
 
 // =====================
 // AUTH (REGISTER + LOGIN)
