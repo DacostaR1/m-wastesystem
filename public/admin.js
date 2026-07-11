@@ -138,12 +138,11 @@ async function updateRequest(id, status) {
                 "Content-Type": "application/json"
             },
 
-            body: JSON.stringify({
-
-                status: status,
-                admin: "Administrator"
-
-            })
+    body: JSON.stringify({
+    status: "Approved",
+    admin: adminName,
+    remarks: "Approved via dashboard"
+})
 
         });
 
