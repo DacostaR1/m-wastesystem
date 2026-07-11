@@ -128,6 +128,9 @@ async function loadRequests() {
 
 async function updateRequest(id, status) {
 
+ const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
+const adminName = admin.username || "Administrator";
+
     try {
 
         const response = await fetch(`/api/admin/requests/${id}`, {
@@ -138,11 +141,13 @@ async function updateRequest(id, status) {
                 "Content-Type": "application/json"
             },
 
-    body: JSON.stringify({
-    status: "Approved",
-    admin: adminName,
-    remarks: "Approved via dashboard"
-})
+            body: JSON.stringify({
+
+                status: status,
+                admin: adminName,
+                remarks: "Approved by " + adminName
+
+            })
 
         });
 
@@ -152,19 +157,17 @@ async function updateRequest(id, status) {
             throw new Error(result.message || "Update failed.");
         }
 
-        alert(`Request successfully ${status}.`);
+        alert(`Request ${status}.`);
 
         loadRequests();
 
-    }
-    catch (error) {
+    } catch (error) {
 
         console.error(error);
 
         alert(error.message);
 
     }
-
 }
 
 
@@ -195,13 +198,13 @@ async function rejectRequest(id) {
                 "Content-Type": "application/json"
             },
 
-            body: JSON.stringify({
+body: JSON.stringify({
 
-                status: "Rejected",
-                admin: "Administrator",
-                reason: reason.trim()
+    status: "Rejected",
+    admin: adminName,
+    reason: reason.trim()
 
-            })
+})
 
         });
 
@@ -264,12 +267,12 @@ async function assignTruck(id) {
                 "Content-Type": "application/json"
             },
 
-            body: JSON.stringify({
+body: JSON.stringify({
 
-                truck: truck,
-                admin: "Administrator"
+    truck: truck,
+    admin: adminName
 
-            })
+})
 
         });
 
