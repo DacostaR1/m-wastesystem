@@ -1,331 +1,296 @@
-// ===============================
+
+// MOBILE WASTE COLLECTION SYSTEM
 // ADMIN DASHBOARD JAVASCRIPT
-// ===============================
 
 
-// Load all requests
-function loadRequests() {
+document.addEventListener("DOMContentLoaded", () => {
+    loadRequests();
+});
 
-    fetch("/api/admin/requests")
 
-    .then(response => {
+// LOAD ALL REQUESTS
+
+
+async function loadRequests() {
+
+    const table = document.getElementById("requestTable");
+
+    if (!table) {
+        console.error("Request table not found.");
+        return;
+    }
+
+    table.innerHTML = `
+        <tr>
+            <td colspan="8" style="text-align:center;">
+                Loading requests...
+            </td>
+        </tr>
+    `;
+
+    try {
+
+        const response = await fetch("/api/requests");
 
         if (!response.ok) {
-            throw new Error("Failed to load requests");
+            throw new Error("Unable to load requests.");
         }
 
-        return response.json();
-
-    })
-
-    .then(data => {
-
-
-        const table = document.getElementById("requestTable");
-
-
-        if (!table) {
-            console.error("requestTable not found");
-            return;
-        }
-
+        const requests = await response.json();
 
         table.innerHTML = "";
 
+        if (requests.length === 0) {
 
-        data.forEach(request => {
-
-
-            table.innerHTML += `
-
-            <tr>
-
-                <td>${request.id}</td>
-
-                <td>${request.name}</td>
-
-                <td>${request.phone}</td>
-
-                <td>${request.location}</td>
-
-                <td>${request.wasteType}</td>
-
-                <td>${request.status}</td>
-
-
-                <td>
-
-                    <input 
-                    id="truck-${request.id}" 
-                    placeholder="Truck Number">
-
-                </td>
-
-
-                <td>
-
-
-                    <button 
-                    onclick="updateRequest(${request.id}, 'Approved')">
-                        Approve
-                    </button>
-
-
-                    <button 
-                    onclick="updateRequest(${request.id}, 'Rejected')">
-                        Reject
-                    </button>
-
-
-                    <button 
-                    onclick="assignTruck(${request.id})">
-                        Assign Truck
-                    </button>
-
-
-                </td>
-
-
-            </tr>
-
+            table.innerHTML = `
+                <tr>
+                    <td colspan="8" style="text-align:center;">
+                        No requests found.
+                    </td>
+                </tr>
             `;
 
+            return;
+        }
+
+        requests.forEach(request => {
+
+            table.innerHTML += `
+                <tr>
+
+                    <td>${request.id}</td>
+
+                    <td>${request.name}</td>
+
+                    <td>${request.phone}</td>
+
+                    <td>${request.location}</td>
+
+                    <td>${request.wasteType}</td>
+
+                    <td>${request.status}</td>
+
+                    <td>
+
+                        <input
+                            type="text"
+                            id="truck-${request.id}"
+                            value="${request.assigned_truck || ""}"
+                            placeholder="Truck Number"
+                        >
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            onclick="updateRequest(${request.id}, 'Approved')">
+                            Approve
+                        </button>
+
+                        <button
+                            onclick="rejectRequest(${request.id})">
+                            Reject
+                        </button>
+
+                        <button
+                            onclick="assignTruck(${request.id})">
+                            Assign Truck
+                        </button>
+
+                    </td>
+
+                </tr>
+            `;
 
         });
 
+    }
+    catch (error) {
 
-    })
+        console.error(error);
 
-    .catch(error => {
+        table.innerHTML = `
+            <tr>
+                <td colspan="8" style="color:red;text-align:center;">
+                    Failed to load requests.
+                </td>
+            </tr>
+        `;
 
-        console.error(
-            "Loading requests failed:",
-            error
-        );
-
-    });
-
+    }
 
 }
 
 
+// APPROVE REQUEST
 
 
-// Approve / Reject request
 async function updateRequest(id, status) {
-
 
     try {
 
+        const response = await fetch(`/api/admin/requests/${id}`, {
 
-        const response = await fetch(
-            `/api/admin/requests/${id}`,
-            {
+            method: "PUT",
 
-                method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-                headers: {
+            body: JSON.stringify({
 
-                    "Content-Type": "application/json"
+                status: status,
+                admin: "Administrator"
 
-                },
+            })
 
-
-                body: JSON.stringify({
-
-                    status: status
-
-                })
-
-            }
-        );
-
-
+        });
 
         const result = await response.json();
 
-
-
         if (!response.ok) {
-
-            throw new Error(
-                result.message || "Update failed"
-            );
-
+            throw new Error(result.message || "Update failed.");
         }
 
-
-
-        console.log(result);
-
-
-
-        alert(
-            `Request ${status}`
-        );
-
-
+        alert(`Request successfully ${status}.`);
 
         loadRequests();
 
+    }
+    catch (error) {
 
+        console.error(error);
+
+        alert(error.message);
 
     }
-
-
-    catch(error) {
-
-
-        console.error(
-            "Request update error:",
-            error
-        );
-
-
-        alert(
-            "Failed to update request"
-        );
-
-
-    }
-
 
 }
 
 
+// REJECT REQUEST
 
 
+async function rejectRequest(id) {
 
-// Assign truck
-async function assignTruck(id) {
+    const reason = prompt("Enter rejection reason:");
 
+    if (reason === null) return;
 
-    const truckInput =
-    document.getElementById(`truck-${id}`);
+    if (reason.trim() === "") {
 
-
-
-    if (!truckInput) {
-
-        alert(
-            "Truck input missing"
-        );
+        alert("Rejection reason is required.");
 
         return;
 
     }
-
-
-
-    const truck =
-    truckInput.value.trim();
-
-
-
-
-    if (!truck) {
-
-        alert(
-            "Please enter truck number"
-        );
-
-        return;
-
-    }
-
-
 
     try {
 
+        const response = await fetch(`/api/admin/requests/${id}`, {
 
-        const response = await fetch(
-            `/api/admin/requests/${id}`,
-            {
+            method: "PUT",
 
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-                method:"PUT",
+            body: JSON.stringify({
 
+                status: "Rejected",
+                admin: "Administrator",
+                reason: reason.trim()
 
-                headers:{
+            })
 
-                    "Content-Type":"application/json"
+        });
 
-                },
-
-
-                body:JSON.stringify({
-
-                    truck:truck
-
-                })
-
-
-            }
-        );
-
-
-
-        const result =
-        await response.json();
-
-
+        const result = await response.json();
 
         if (!response.ok) {
-
-            throw new Error(
-                result.message || "Truck assignment failed"
-            );
-
+            throw new Error(result.message || "Rejection failed.");
         }
 
-
-
-        console.log(result);
-
-
-
-        alert(
-            "Truck assigned successfully"
-        );
-
-
+        alert("Request rejected successfully.");
 
         loadRequests();
 
+    }
+    catch (error) {
 
+        console.error(error);
+
+        alert(error.message);
 
     }
-
-
-    catch(error) {
-
-
-        console.error(
-            "Truck assignment error:",
-            error
-        );
-
-
-        alert(
-            "Failed to assign truck"
-        );
-
-
-    }
-
 
 }
 
+// =====================================
+// ASSIGN TRUCK
+// =====================================
 
+async function assignTruck(id) {
 
+    const input = document.getElementById(`truck-${id}`);
 
+    if (!input) {
 
-// Automatically load when page opens
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+        alert("Truck input not found.");
+
+        return;
+
+    }
+
+    const truck = input.value.trim();
+
+    if (truck === "") {
+
+        alert("Please enter a truck number.");
+
+        input.focus();
+
+        return;
+
+    }
+
+    try {
+
+        const response = await fetch(`/api/admin/requests/${id}`, {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                truck: truck,
+                admin: "Administrator"
+
+            })
+
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Truck assignment failed.");
+        }
+
+        alert("Truck assigned successfully.");
 
         loadRequests();
 
     }
-);
+    catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+
+}

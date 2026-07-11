@@ -533,9 +533,9 @@ app.get("/api/requests", (req, res) => {
   );
 });
 
-// 
-// Approving a request ROUTE
-//Admin Actions
+
+
+//Admin Actions ROUTE
 
 app.put("/api/admin/requests/:id", async (req,res)=>{
 
@@ -692,11 +692,11 @@ db.query(sql, values, (err)=>{
 
 });
 
-// 
+
 // UPDATE FLEXIBLE  /Dashboard feeds
 //
 app.put("/api/requests/:id", (req, res) => {
-  const { status, truck } = req.body;
+  const { status, truck, admin, reason } = req.body;
 
   let fields = [];
   let values = [];
