@@ -5,6 +5,8 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const path = require("path");
+const { sendNotification } = require("./notificationservice");
+
 
 const app = express();
 const port = process.env.PORT || 10000;
@@ -532,64 +534,179 @@ app.get("/api/requests", (req, res) => {
 });
 
 // 
-// APPROVE
-// 
-app.put("/api/requests/approve/:id", (req, res) => {
+// Approving a request ROUTE
+//Admin Actions
 
-const { admin, remarks } = req.body;
+app.put("/api/admin/requests/:id", async (req,res)=>{
+
+const { status, truck, admin } = req.body;
+
+
+let sql = "UPDATE requests SET ";
+let values = [];
+
+
+if(status !== undefined){
+sql += "status=?, ";
+values.push(status);
+}
+
+
+if(truck !== undefined){
+sql += "assigned_truck=?, ";
+values.push(truck);
+}
+
+
+if(admin !== undefined){
+sql += "approved_by=?, ";
+values.push(admin);
+}
+
+
+sql = sql.replace(/, $/, "");
+
+sql += " WHERE id=?";
+
+values.push(req.params.id);
+
+
+
+db.query(sql, values, (err)=>{
+
+
+if(err){
+
+console.log(err);
+
+return res.status(500).json({
+message:"Update failed"
+});
+
+}
+
+
+
+// Get customer details
 
 db.query(
-`UPDATE requests 
- SET status='Approved',
- action_by=?,
- approver_remarks=?
- WHERE id=?`,
-[admin || "Admin", remarks || "Approved via system", req.params.id],
-(err) => {
-if (err) return res.status(500).json(err);
-res.json({ message: "Approved" });
-});
-});
+"SELECT name,email FROM requests WHERE id=?",
+[req.params.id],
+
+async (err,rows)=>{
+
+if(err){
+    console.log("Requester/customer  lookup failed:", err);
+    return;
+}
+
+if(rows.length === 0){
+    console.log("Requester/Customer not found");
+    return;
+}
+
+
+const customer = rows[0];
+
+
+
+// Approval notification
+
+if(status === "Approved") {
+
+    const sent = await sendNotification(
+        customer.email,
+        "Waste Collection Request Approved",
+        `
+        <h2>Mobile Waste Collection System - Rubaga</h2>
+        <p>Hello ${customer.name},</p>
+        <p>Your waste collection request has been <b style="color:green;">approved</b>.</p>
+          <p>
+    You will receive another notification when a truck is assigned.
+    </p>
+
+    <p>Thank you.</p>
+        `
+    );
+
+    console.log("Approval email result:", sent);
+}
+
+
+// Rejection notification
+
+if (status === "Rejected") {
+
+    const sent = await sendNotification(
+
+        customer.email,
+
+        "Waste Collection Request Rejected",
+
+        `
+        <h2>Mobile Waste Collection System - Rubaga</h2>
+
+        <p>Hello ${customer.name},</p>
+
+        <p>
+        Your waste collection request has been 
+        <b style="color:red;">rejected</b>.
+        </p>
+        `
+
+    );
+
+    console.log("Rejection email sent:", sent);
+
+}
+
+
+// Truck assignment notification
+
+if (truck) {
+
+    const sent = await sendNotification(
+
+        customer.email,
+
+        "Truck Assigned",
+
+        `
+        <h2>Mobile Waste Collection System - Rubaga</h2>
+
+        <p>Hello ${customer.name},</p>
+
+        <p>
+        A waste collection truck has been assigned to collect your waste.
+        </p>
+
+        <p>
+        Truck Number:
+        <b>${truck}</b>
+        </p>
+
+        <p>
+        Please be available on your collection day.
+        </p>
+        `
+
+    );
+
+    console.log("Truck assignment email sent:", sent);
+
+}
+
+}); 
+
+
+}); 
+
+
+}); 
+
 
 // 
-// REJECT
-// 
-app.put("/api/requests/reject/:id", (req, res) => {
-
-const { reason, admin } = req.body;
-
-db.query(
-`UPDATE requests 
- SET status='Rejected',
- rejection_reason=?,
- action_by=?
- WHERE id=?`,
-[reason, admin || "Admin", req.params.id],
-(err) => {
-if (err) return res.status(500).json(err);
-res.json({ message: "Rejected" });
-});
-});
-
-
-// 
-// ASSIGN TRUCK
-// 
-app.put("/api/requests/assign/:id", (req, res) => {
-  const { truck } = req.body;
-
-  db.query(
-    "UPDATE requests SET assigned_truck=? WHERE id=?",
-    [truck, req.params.id],
-    (err) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Truck assigned" });
-    }
-  );
-});
-
-// 
-// UPDATE FLEXIBLE
+// UPDATE FLEXIBLE  /Dashboard feeds
 //
 app.put("/api/requests/:id", (req, res) => {
   const { status, truck } = req.body;
@@ -629,9 +746,11 @@ app.put("/api/requests/:id", (req, res) => {
   });
 });
 
-// 
-// START SERVER
-// 
+
+
+
+// START SERVER //
+
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
