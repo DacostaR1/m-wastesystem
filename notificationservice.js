@@ -1,38 +1,34 @@
 const transporter = require("./email");
 
-
-async function sendNotification(to, subject, message){
+async function sendNotification(to, subject, message) {
 
     try {
 
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
 
             from: `"Mobile Waste Collection System - Rubaga" <${process.env.EMAIL_USER}>`,
 
-            to: to,
+            to,
 
-            subject: subject,
+            subject,
 
             html: message
 
         });
 
-
-        console.log("Email sent successfully to:", to);
+        console.log("✅ Email sent");
+        console.log("Message ID:", info.messageId);
 
         return true;
 
+    } catch (err) {
 
-    } catch(error){
-
-        console.log("Email error:", error.message);
+        console.error("❌ Email sending failed");
+        console.error(err);
 
         return false;
-
     }
-
 }
-
 
 module.exports = {
     sendNotification
