@@ -417,7 +417,8 @@ grid.innerHTML = "Failed to load requests";
 
 async function approveRequest(id){
 
-const admin = JSON.parse(sessionStorage.getItem("loggedAdmin"));
+const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
+const adminName = admin.username || "Administrator";
 
 const response = await fetch(`/api/admin/requests/${id}`,{
 
@@ -430,7 +431,7 @@ headers:{
 body:JSON.stringify({
 
 status:"Approved",
-admin:admin.username
+admin: adminName
 
 })
 
@@ -460,7 +461,8 @@ const reason = prompt("Enter rejection reason:");
 
 if(!reason) return;
 
-const admin = JSON.parse(sessionStorage.getItem("loggedAdmin"));
+const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
+const adminName = admin.username || "Administrator";
 
 const response = await fetch(`/api/admin/requests/${id}`,{
 
@@ -474,7 +476,7 @@ body:JSON.stringify({
 
 status:"Rejected",
 reason:reason,
-admin:admin.username
+admin: adminName
 
 })
 
@@ -505,7 +507,8 @@ const truck = prompt("Enter truck number:");
 
 if(!truck) return;
 
-const admin = JSON.parse(sessionStorage.getItem("loggedAdmin"));
+const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
+const adminName = admin.username || "Administrator";
 
 const response = await fetch(`/api/admin/requests/${id}`,{
 
@@ -518,7 +521,7 @@ headers:{
 body:JSON.stringify({
 
 truck:truck,
-admin:admin.username
+admin: adminName
 
 })
 
@@ -537,6 +540,18 @@ loadRequests();
 loadStats();
 
 }
+
+
+// INITIALIZE PAGE
+
+
+window.addEventListener("load", () => {
+
+    loadRequests();
+
+    loadStats();
+
+});
 
 </script>
 

@@ -539,7 +539,7 @@ app.get("/api/requests", (req, res) => {
 
 app.put("/api/admin/requests/:id", async (req,res)=>{
 
-const { status, truck, admin } = req.body;
+const { status, truck, admin, reason } = req.body;
 
 
 let sql = "UPDATE requests SET ";
