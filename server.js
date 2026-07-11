@@ -547,20 +547,18 @@ let values = [];
 
 
 if(status !== undefined){
-sql += "status=?, ";
-values.push(status);
+    sql += "status=?, ";
+    values.push(status);
 }
-
 
 if(truck !== undefined){
-sql += "assigned_truck=?, ";
-values.push(truck);
+    sql += "assigned_truck=?, ";
+    values.push(truck);
 }
 
-
 if(admin !== undefined){
-sql += "approved_by=?, ";
-values.push(admin);
+    sql += "approved_by=?, ";
+    values.push(admin);
 }
 
 
@@ -574,137 +572,124 @@ values.push(req.params.id);
 
 db.query(sql, values, (err)=>{
 
+    if(err){
+        console.log(err);
 
-if(err){
+        return res.status(500).json({
+            message:"Update failed"
+        });
+    }
 
-console.log(err);
 
-return res.status(500).json({
-message:"Update failed"
+    // Send response immediately
+    res.json({
+        message:"Request updated successfully"
+    });
+
+
+
+    // Send notification after update
+    db.query(
+        "SELECT name,email FROM requests WHERE id=?",
+        [req.params.id],
+
+        async (err,rows)=>{
+
+            if(err){
+                console.log("Customer lookup failed:", err);
+                return;
+            }
+
+
+            if(rows.length === 0){
+                console.log("Customer not found");
+                return;
+            }
+
+
+            const customer = rows[0];
+
+
+            try{
+
+
+                if(status === "Approved"){
+
+                    await sendNotification(
+                        customer.email,
+                        "Waste Collection Request Approved",
+
+                        `
+                        <h2>Mobile Waste Collection System - Rubaga</h2>
+                        <p>Hello ${customer.name},</p>
+                        <p>Your waste collection request has been 
+                        <b style="color:green;">approved</b>.</p>
+                        <p>Thank you.</p>
+                        `
+                    );
+
+                    console.log("Approval email sent");
+
+                }
+
+
+
+                if(status === "Rejected"){
+
+                    await sendNotification(
+                        customer.email,
+                        "Waste Collection Request Rejected",
+
+                        `
+                        <h2>Mobile Waste Collection System - Rubaga</h2>
+                        <p>Hello ${customer.name},</p>
+                        <p>Your waste collection request has been 
+                        <b style="color:red;">rejected</b>.</p>
+                        `
+                    );
+
+                    console.log("Rejection email sent");
+
+                }
+
+
+
+                if(truck){
+
+                    await sendNotification(
+                        customer.email,
+                        "Truck Assigned",
+
+                        `
+                        <h2>Mobile Waste Collection System - Rubaga</h2>
+                        <p>Hello ${customer.name},</p>
+                        <p>A truck has been assigned to your waste collection request.</p>
+                        <p>Truck Number: <b>${truck}</b></p>
+                        `
+                    );
+
+                    console.log("Truck assignment email sent");
+
+                }
+
+
+            }catch(error){
+
+                console.log(
+                    "Notification error:",
+                    error.message
+                );
+
+            }
+
+
+        }
+    );
+
+
 });
 
-}
 
-
-
-// Get customer details
-
-db.query(
-"SELECT name,email FROM requests WHERE id=?",
-[req.params.id],
-
-async (err,rows)=>{
-
-if(err){
-    console.log("Requester/customer  lookup failed:", err);
-    return;
-}
-
-if(rows.length === 0){
-    console.log("Requester/Customer not found");
-    return;
-}
-
-
-const customer = rows[0];
-
-
-
-// Approval notification
-
-if(status === "Approved") {
-
-    const sent = await sendNotification(
-        customer.email,
-        "Waste Collection Request Approved",
-        `
-        <h2>Mobile Waste Collection System - Rubaga</h2>
-        <p>Hello ${customer.name},</p>
-        <p>Your waste collection request has been <b style="color:green;">approved</b>.</p>
-          <p>
-    You will receive another notification when a truck is assigned.
-    </p>
-
-    <p>Thank you.</p>
-        `
-    );
-
-    console.log("Approval email result:", sent);
-}
-
-
-// Rejection notification
-
-if (status === "Rejected") {
-
-    const sent = await sendNotification(
-
-        customer.email,
-
-        "Waste Collection Request Rejected",
-
-        `
-        <h2>Mobile Waste Collection System - Rubaga</h2>
-
-        <p>Hello ${customer.name},</p>
-
-        <p>
-        Your waste collection request has been 
-        <b style="color:red;">rejected</b>.
-        </p>
-        `
-
-    );
-
-    console.log("Rejection email sent:", sent);
-
-}
-
-
-// Truck assignment notification
-
-if (truck) {
-
-    const sent = await sendNotification(
-
-        customer.email,
-
-        "Truck Assigned",
-
-        `
-        <h2>Mobile Waste Collection System - Rubaga</h2>
-
-        <p>Hello ${customer.name},</p>
-
-        <p>
-        A waste collection truck has been assigned to collect your waste.
-        </p>
-
-        <p>
-        Truck Number:
-        <b>${truck}</b>
-        </p>
-
-        <p>
-        Please be available on your collection day.
-        </p>
-        `
-
-    );
-
-    console.log("Truck assignment email sent:", sent);
-
-}
-
-}); 
-
-
-}); 
-
-
-}); 
-res.json({
-    message:"Request updated successfully"
 });
 
 // 
@@ -725,6 +710,7 @@ app.put("/api/requests/:id", (req, res) => {
     fields.push("assigned_truck=?");
     values.push(truck);
   }
+
 
   if (fields.length === 0) {
     return res.status(400).json({ message: "No update data" });
