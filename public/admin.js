@@ -1,123 +1,331 @@
-
-//Admin Dashboard 
-//Get requests from server and render in table
-
-app.get("/api/admin/requests", (req,res)=>{
-
-db.query(
-"SELECT * FROM requests ORDER BY id DESC",
-(err,rows)=>{
-
-if(err){
-console.log(err);
-return res.status(500).json([]);
-}
-
-res.json(rows);
-
-});
-
-});
+// ===============================
+// ADMIN DASHBOARD JAVASCRIPT
+// ===============================
 
 
-//Admin Actions
+// Load all requests
+function loadRequests() {
 
-app.put("/api/admin/requests/:id", (req,res)=>{
+    fetch("/api/admin/requests")
 
-const { status, truck, admin } = req.body;
+    .then(response => {
 
-// Build dynamic update (prevents overwriting nulls)
-let sql = "UPDATE requests SET ";
-let values = [];
+        if (!response.ok) {
+            throw new Error("Failed to load requests");
+        }
 
-if(status !== undefined){
-sql += "status=?, ";
-values.push(status);
-}
+        return response.json();
 
-if(truck !== undefined){
-sql += "assigned_truck=?, ";
-values.push(truck);
-}
+    })
 
-if(admin !== undefined){
-sql += "approved_by=?, ";
-values.push(admin);
-}
+    .then(data => {
 
 
-sql = sql.replace(/, $/, "");
-
-sql += " WHERE id=?";
-values.push(req.params.id);
-
-db.query(sql, values, (err)=>{
-
-if(err){
-console.log(err);
-return res.status(500).json({
-message:"Update failed"
-});
-}
-
-res.json({
-message:"Request updated successfully"
-});
-
-});
-
-});
+        const table = document.getElementById("requestTable");
 
 
-//admin logic workflow
-function loadRequests(){
+        if (!table) {
+            console.error("requestTable not found");
+            return;
+        }
 
-fetch("/api/admin/requests")
-.then(r=>r.json())
-.then(data=>{
 
-const table =
-document.getElementById("requestTable");
+        table.innerHTML = "";
 
-table.innerHTML="";
 
-data.forEach(r=>{
+        data.forEach(request => {
 
-table.innerHTML += `
-<tr>
 
-<td>${r.id}</td>
-<td>${r.name}</td>
-<td>${r.phone}</td>
-<td>${r.location}</td>
-<td>${r.wasteType}</td>
-<td>${r.status}</td>
+            table.innerHTML += `
 
-<td>
-<input id="truck-${r.id}" placeholder="Truck">
-</td>
+            <tr>
 
-<td>
+                <td>${request.id}</td>
 
-<button onclick="updateRequest(${r.id},'Approved')">
-Approve
-</button>
+                <td>${request.name}</td>
 
-<button onclick="updateRequest(${r.id},'Rejected')">
-Reject
-</button>
+                <td>${request.phone}</td>
 
-<button onclick="assignTruck(${r.id})">
-Assign Truck
-</button>
+                <td>${request.location}</td>
 
-</td>
+                <td>${request.wasteType}</td>
 
-</tr>
-`;
+                <td>${request.status}</td>
 
-});
 
-});
+                <td>
+
+                    <input 
+                    id="truck-${request.id}" 
+                    placeholder="Truck Number">
+
+                </td>
+
+
+                <td>
+
+
+                    <button 
+                    onclick="updateRequest(${request.id}, 'Approved')">
+                        Approve
+                    </button>
+
+
+                    <button 
+                    onclick="updateRequest(${request.id}, 'Rejected')">
+                        Reject
+                    </button>
+
+
+                    <button 
+                    onclick="assignTruck(${request.id})">
+                        Assign Truck
+                    </button>
+
+
+                </td>
+
+
+            </tr>
+
+            `;
+
+
+        });
+
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Loading requests failed:",
+            error
+        );
+
+    });
+
 
 }
+
+
+
+
+// Approve / Reject request
+async function updateRequest(id, status) {
+
+
+    try {
+
+
+        const response = await fetch(
+            `/api/admin/requests/${id}`,
+            {
+
+                method: "PUT",
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                },
+
+
+                body: JSON.stringify({
+
+                    status: status
+
+                })
+
+            }
+        );
+
+
+
+        const result = await response.json();
+
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message || "Update failed"
+            );
+
+        }
+
+
+
+        console.log(result);
+
+
+
+        alert(
+            `Request ${status}`
+        );
+
+
+
+        loadRequests();
+
+
+
+    }
+
+
+    catch(error) {
+
+
+        console.error(
+            "Request update error:",
+            error
+        );
+
+
+        alert(
+            "Failed to update request"
+        );
+
+
+    }
+
+
+}
+
+
+
+
+
+// Assign truck
+async function assignTruck(id) {
+
+
+    const truckInput =
+    document.getElementById(`truck-${id}`);
+
+
+
+    if (!truckInput) {
+
+        alert(
+            "Truck input missing"
+        );
+
+        return;
+
+    }
+
+
+
+    const truck =
+    truckInput.value.trim();
+
+
+
+
+    if (!truck) {
+
+        alert(
+            "Please enter truck number"
+        );
+
+        return;
+
+    }
+
+
+
+    try {
+
+
+        const response = await fetch(
+            `/api/admin/requests/${id}`,
+            {
+
+
+                method:"PUT",
+
+
+                headers:{
+
+                    "Content-Type":"application/json"
+
+                },
+
+
+                body:JSON.stringify({
+
+                    truck:truck
+
+                })
+
+
+            }
+        );
+
+
+
+        const result =
+        await response.json();
+
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message || "Truck assignment failed"
+            );
+
+        }
+
+
+
+        console.log(result);
+
+
+
+        alert(
+            "Truck assigned successfully"
+        );
+
+
+
+        loadRequests();
+
+
+
+    }
+
+
+    catch(error) {
+
+
+        console.error(
+            "Truck assignment error:",
+            error
+        );
+
+
+        alert(
+            "Failed to assign truck"
+        );
+
+
+    }
+
+
+}
+
+
+
+
+
+// Automatically load when page opens
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadRequests();
+
+    }
+);
