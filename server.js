@@ -703,7 +703,9 @@ if (truck) {
 
 
 }); 
-
+res.json({
+    message:"Request updated successfully"
+});
 
 // 
 // UPDATE FLEXIBLE  /Dashboard feeds
