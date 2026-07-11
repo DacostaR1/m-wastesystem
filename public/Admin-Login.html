@@ -170,7 +170,10 @@ popup(data.message || "Login failed");
 return;
 }
 
-localStorage.setItem("admin", JSON.stringify(data.admin));
+sessionStorage.setItem(
+    "loggedAdmin",
+    JSON.stringify(data.admin)
+);
 
 popup("Login successful");
 
