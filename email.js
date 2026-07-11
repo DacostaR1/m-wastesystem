@@ -1,7 +1,8 @@
-const dns = require("dns");
-dns.setDefaultResultOrder("ipv4first");
-
 const nodemailer = require("nodemailer");
+
+// ======================================
+// EMAIL CONFIGURATION
+// ======================================
 
 console.log("======================================");
 console.log("EMAIL MODULE LOADED");
@@ -14,35 +15,67 @@ console.log(
 );
 console.log("======================================");
 
+// ======================================
+// CREATE SMTP TRANSPORTER
+// ======================================
+
 const transporter = nodemailer.createTransport({
+
     host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT, 10),
-    secure: parseInt(process.env.EMAIL_PORT, 10) === 465,
+
+    port: Number(process.env.EMAIL_PORT),
+
+    secure: false, // Port 587 uses STARTTLS
+
+    requireTLS: true,
 
     auth: {
+
         user: process.env.EMAIL_USER,
+
         pass: process.env.EMAIL_PASS
+
     },
 
-    family: 4,
+    connectionTimeout: 30000,
 
-    connectionTimeout: 20000,
-    greetingTimeout: 20000,
-    socketTimeout: 20000,
+    greetingTimeout: 30000,
+
+    socketTimeout: 30000,
 
     tls: {
         rejectUnauthorized: false
     }
+
 });
 
+// ======================================
+// VERIFY SMTP CONNECTION
+// ======================================
+
 (async () => {
+
     try {
+
         await transporter.verify();
+
+        console.log("======================================");
         console.log("SMTP CONNECTION READY");
+        console.log("======================================");
+
     } catch (err) {
-        console.error("SMTP CONNECTION FAILED");
-        console.error(err);
+
+        console.log("======================================");
+        console.log("SMTP CONNECTION FAILED");
+        console.log(err);
+        console.log("======================================");
+
     }
+
 })();
+
+// ======================================
+// EXPORT TRANSPORTER
+// ======================================
 
 module.exports = transporter;
