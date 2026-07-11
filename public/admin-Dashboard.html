@@ -378,7 +378,7 @@ ${r.status || "Pending"}
 
 <p><b>Truck:</b> ${r.assigned_truck || "-"}</p>
 
-<p><b>Action By:</b> ${r.action_by || "-"}</p>
+<p><b>Approved By:</b> ${r.approved_by || "-"}</p>
 <p><b>Remarks:</b> ${r.remarks || "-"}</p>
 <p><b>Rejection Reason:</b> ${r.rejection_reason || "-"}</p>
 
@@ -414,19 +414,40 @@ grid.innerHTML = "Failed to load requests";
 // 
 // APPROVE 
 //
+
 async function approveRequest(id){
 
-await fetch(`/api/requests/approve/${id}`, {
+const admin = JSON.parse(sessionStorage.getItem("loggedAdmin"));
+
+const response = await fetch(`/api/admin/requests/${id}`,{
+
 method:"PUT",
-headers:{"Content-Type":"application/json"},
+
+headers:{
+"Content-Type":"application/json"
+},
+
 body:JSON.stringify({
-admin:"Admin",
-remarks:"Approved via dashboard"
+
+status:"Approved",
+admin:admin.username
+
 })
+
 });
+
+const result = await response.json();
+
+if(!response.ok){
+alert(result.message);
+return;
+}
+
+alert("Request approved successfully.");
 
 loadRequests();
 loadStats();
+
 }
 
 // 
@@ -435,45 +456,87 @@ loadStats();
 
 async function rejectRequest(id){
 
-let reason = prompt("Enter rejection reason:");
+const reason = prompt("Enter rejection reason:");
+
 if(!reason) return;
 
-await fetch(`/api/requests/reject/${id}`, {
+const admin = JSON.parse(sessionStorage.getItem("loggedAdmin"));
+
+const response = await fetch(`/api/admin/requests/${id}`,{
+
 method:"PUT",
-headers:{"Content-Type":"application/json"},
+
+headers:{
+"Content-Type":"application/json"
+},
+
 body:JSON.stringify({
-reason,
-admin:"Admin"
+
+status:"Rejected",
+reason:reason,
+admin:admin.username
+
 })
+
 });
+
+const result = await response.json();
+
+if(!response.ok){
+alert(result.message);
+return;
+}
+
+alert("Request rejected.");
 
 loadRequests();
 loadStats();
+
 }
 
-// 
+
+
+
 // ASSIGN TRUCK
 // 
 async function assignTruck(id){
 
-let truck = prompt("Enter truck number:");
+const truck = prompt("Enter truck number:");
+
 if(!truck) return;
 
-await fetch(`/api/requests/assign/${id}`, {
+const admin = JSON.parse(sessionStorage.getItem("loggedAdmin"));
+
+const response = await fetch(`/api/admin/requests/${id}`,{
+
 method:"PUT",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({truck})
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+truck:truck,
+admin:admin.username
+
+})
+
 });
 
-loadRequests();
-loadStats();
+const result = await response.json();
+
+if(!response.ok){
+alert(result.message);
+return;
 }
 
-// INIT
-window.onload = () => {
+alert("Truck assigned successfully.");
+
 loadRequests();
 loadStats();
-};
+
+}
 
 </script>
 
