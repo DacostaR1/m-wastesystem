@@ -282,7 +282,7 @@ err.message
 
 
 
-// SYSTEM LOGIN (ADMIN + COLLECTOR)
+// SYSTEM LOGIN (ADMINs and COLLECTORs)
 
 
 app.post("/api/login", (req, res) => {
@@ -622,7 +622,7 @@ console.log("******** ADMIN ROUTE EXECUTED ********");
     console.log("Body:", req.body);
     console.log("==================================");
 
-  const { status, truck, admin, reason, remarks } = req.body;
+  const { status, truck, admin, reason, remarks , assigned_collector } = req.body;
 const requestId = req.params.id;
 
     let sql = "UPDATE requests SET ";
@@ -661,7 +661,11 @@ const requestId = req.params.id;
     }
 
     sql = sql.replace(/, $/, "");
-
+    
+if (assigned_collector !== undefined) {
+    sql += "assigned_collector=?, ";
+    values.push(assigned_collector);
+}
     sql += " WHERE id=?";
     values.push(requestId);
 

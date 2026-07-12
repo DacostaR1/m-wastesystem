@@ -503,46 +503,86 @@ loadStats();
 
 // ASSIGN TRUCK
 // 
+
+let currentRequestId = null;
+
 async function assignTruck(id){
 
-const truck = prompt("Enter truck number:");
+    currentRequestId = id;
 
-if(!truck) return;
+    const res = await fetch("/api/collectors");
+    const collectors = await res.json();
 
-const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
-const adminName = admin.username || "Administrator";
+    const select = document.getElementById("collectorSelect");
 
-const response = await fetch(`/api/admin/requests/${id}`,{
+    select.innerHTML = "";
 
-method:"PUT",
+    collectors.forEach(c=>{
 
-headers:{
-"Content-Type":"application/json"
-},
+        select.innerHTML += `
+        <option value="${c.id}">
+            ${c.full_name}
+        </option>
+        `;
 
-body:JSON.stringify({
+    });
 
-truck:truck,
-admin: adminName
+    document.getElementById("truckInput").value = "";
 
-})
-
-});
-
-const result = await response.json();
-
-if(!response.ok){
-alert(result.message);
-return;
-}
-
-alert("Truck assigned successfully.");
-
-loadRequests();
-loadStats();
+    document.getElementById("assignModal").style.display = "block";
 
 }
 
+async function saveAssignment(){
+
+    const truck = document.getElementById("truckInput").value;
+    const collector = document.getElementById("collectorSelect").value;
+
+    const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
+
+    const response = await fetch(`/api/admin/requests/${currentRequestId}`,{
+
+        method:"PUT",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            truck:truck,
+            assigned_collector:collector,
+            admin:admin.username
+
+        })
+
+    });
+
+    const result = await response.json();
+
+    if(!response.ok){
+
+        alert(result.message);
+
+        return;
+
+    }
+
+    alert("Assignment successful.");
+
+    closeAssignModal();
+
+    loadRequests();
+
+    loadStats();
+
+}
+
+function closeAssignModal(){
+
+    document.getElementById("assignModal").style.display = "none";
+
+}
 
 // INITIALIZE PAGE
 
@@ -568,6 +608,59 @@ window.addEventListener("load", () => {
 
 
 </div>
+
+<div id="assignModal" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.5);
+">
+
+<div style="
+background:#fff;
+width:350px;
+margin:100px auto;
+padding:20px;
+border-radius:10px;
+">
+
+<h3>Assign Truck</h3>
+
+<label>Truck Number</label>
+
+<input
+id="truckInput"
+type="text"
+style="width:100%;padding:8px;margin:8px 0;">
+
+<label>Collector</label>
+
+<select
+id="collectorSelect"
+style="width:100%;padding:8px;margin:8px 0;">
+</select>
+
+<br><br>
+
+<button
+onclick="saveAssignment()"
+class="assign">
+Assign
+</button>
+
+<button
+onclick="closeAssignModal()"
+class="reject">
+Cancel
+</button>
+
+</div>
+
+</div>
+
 </body>
 
 <p style="text-align: center;color: white;">© 2026 Mobile Waste Collection System Rubaga | Developed by VU Finalist 2026 Team </p>
