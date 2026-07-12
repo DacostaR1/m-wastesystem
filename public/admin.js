@@ -1,343 +1,270 @@
-
+// ===============================
 // MOBILE WASTE COLLECTION SYSTEM
-// ADMIN DASHBOARD JAVASCRIPT
+// ADMIN DASHBOARD
+// ===============================
 
+const grid = document.getElementById("grid");
+const stats = document.getElementById("stats");
 
+let currentRequestId = null;
+
+// ===============================
+// INITIALIZE
+// ===============================
 document.addEventListener("DOMContentLoaded", () => {
+
+    const user = JSON.parse(sessionStorage.getItem("loggedUser") || "{}");
+
+    document.getElementById("adminWelcome").innerHTML =
+        `Welcome, <strong>${user.full_name || "Administrator"}</strong>`;
+
+    loadStats();
     loadRequests();
+
+    // Hamburger Menu
+    document.getElementById("menuBtn").onclick = openMenu;
 });
 
 
-// Show the logged admin Name
+// ===============================
+// LOAD STATS
+// ===============================
+async function loadStats() {
 
+    const res = await fetch("/api/requests");
+    const data = await res.json();
 
-function getAdminName() {
+    const pending = data.filter(r => (r.status || "").toLowerCase() === "pending").length;
+    const approved = data.filter(r => (r.status || "").toLowerCase() === "approved").length;
+    const rejected = data.filter(r => (r.status || "").toLowerCase() === "rejected").length;
+    const assigned = data.filter(r => (r.status || "").toLowerCase() === "assigned").length;
 
-    const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
-
-    return admin.username || "Administrator";
+    stats.innerHTML = `
+        <div class="box">Pending<br><br>${pending}</div>
+        <div class="box">Approved<br><br>${approved}</div>
+        <div class="box">Rejected<br><br>${rejected}</div>
+        <div class="box">Assigned<br><br>${assigned}</div>
+    `;
 }
 
-// LOAD ALL REQUESTS
 
-
+// ===============================
+// LOAD REQUESTS
+// ===============================
 async function loadRequests() {
 
-    const table = document.getElementById("requestTable");
+    const res = await fetch("/api/requests");
+    const data = await res.json();
 
-    if (!table) {
-        console.error("Request table not found.");
+    grid.innerHTML = "";
+
+    if (data.length === 0) {
+        grid.innerHTML = "<h3>No requests found.</h3>";
         return;
     }
 
-    table.innerHTML = `
-        <tr>
-            <td colspan="8" style="text-align:center;">
-                Loading requests...
-            </td>
-        </tr>
-    `;
+    data.forEach(r => {
 
-    try {
+        const status = (r.status || "Pending").toLowerCase();
 
-        const response = await fetch("/api/requests");
+        const badge =
+            status === "approved" ? "approved" :
+            status === "rejected" ? "rejected" :
+            status === "assigned" ? "assigned" :
+            "pending";
 
-        if (!response.ok) {
-            throw new Error("Unable to load requests.");
-        }
+        grid.innerHTML += `
+        <div class="card">
 
-        const requests = await response.json();
+            <p><b>Name:</b> ${r.name}</p>
+            <p><b>Location:</b> ${r.location}</p>
+            <p><b>Phone:</b> ${r.phone}</p>
+            <p><b>Email:</b> ${r.email}</p>
+            <p><b>Waste:</b> ${r.wasteType}</p>
 
-        table.innerHTML = "";
+            <p>
+                <span class="status ${badge}">
+                    ${r.status}
+                </span>
+            </p>
 
-        if (requests.length === 0) {
+            <p><b>Truck:</b> ${r.assigned_truck || "-"}</p>
 
-            table.innerHTML = `
-                <tr>
-                    <td colspan="8" style="text-align:center;">
-                        No requests found.
-                    </td>
-                </tr>
-            `;
+            <p><b>Collector:</b> ${r.assigned_collector || "-"}</p>
 
-            return;
-        }
+            <div class="actions">
 
-        requests.forEach(request => {
+                <button class="approve"
+                    onclick="approveRequest(${r.id})">
+                    Approve
+                </button>
 
-            table.innerHTML += `
-                <tr>
+                <button class="reject"
+                    onclick="rejectRequest(${r.id})">
+                    Reject
+                </button>
 
-                    <td>${request.id}</td>
+                <button class="assign"
+                    onclick="assignTruck(${r.id})">
+                    Assign
+                </button>
 
-                    <td>${request.name}</td>
+            </div>
 
-                    <td>${request.phone}</td>
-
-                    <td>${request.location}</td>
-
-                    <td>${request.wasteType}</td>
-
-                    <td>${request.status}</td>
-
-                    <td>
-
-                        <input
-                            type="text"
-                            id="truck-${request.id}"
-                            value="${request.assigned_truck || ""}"
-                            placeholder="Truck Number"
-                        >
-
-                    </td>
-
-                    <td>
-
-                        <button
-                            onclick="updateRequest(${request.id}, 'Approved')">
-                            Approve
-                        </button>
-
-                        <button
-                            onclick="rejectRequest(${request.id})">
-                            Reject
-                        </button>
-
-                        <button
-                            onclick="assignTruck(${request.id})">
-                            Assign Truck
-                        </button>
-
-                    </td>
-
-                </tr>
-            `;
-
-        });
-
-    }
-    catch (error) {
-
-        console.error(error);
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="8" style="color:red;text-align:center;">
-                    Failed to load requests.
-                </td>
-            </tr>
+        </div>
         `;
+    });
+}
 
-    }
+
+// ===============================
+// APPROVE
+// ===============================
+async function approveRequest(id){
+
+    await fetch(`/api/admin/requests/${id}`,{
+        method:"PUT",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            status:"Approved"
+        })
+    });
+
+    loadStats();
+    loadRequests();
+}
+
+
+// ===============================
+// REJECT
+// ===============================
+async function rejectRequest(id){
+
+    const reason = prompt("Reason for rejection");
+
+    if(!reason) return;
+
+    await fetch(`/api/admin/requests/${id}`,{
+
+        method:"PUT",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            status:"Rejected",
+            reason
+        })
+
+    });
+
+    loadStats();
+    loadRequests();
 
 }
 
 
-// APPROVE REQUEST
+// ===============================
+// ASSIGN
+// ===============================
+async function assignTruck(id){
 
+    currentRequestId = id;
 
-async function updateRequest(id, status) {
+    const res = await fetch("/api/collectors");
+    const collectors = await res.json();
 
- const admin = JSON.parse(sessionStorage.getItem("loggedAdmin") || "{}");
-const adminName = getAdminName();
-    try {
+    const select = document.getElementById("collectorSelect");
 
-        const response = await fetch(`/api/admin/requests/${id}`, {
+    select.innerHTML = "";
 
-            method: "PUT",
+    collectors.forEach(c=>{
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+        select.innerHTML +=
+        `<option value="${c.id}">
+            ${c.full_name}
+        </option>`;
 
-            body: JSON.stringify({
+    });
 
-                status: status,
-                admin: adminName,
-                remarks: "Approved by " + adminName
-
-            })
-
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || "Update failed.");
-        }
-
-        alert(`Request ${status}.`);
-
-        loadRequests();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert(error.message);
-
-    }
-}
-
-
-// REJECT REQUEST
-
-
-async function rejectRequest(id) {
-
-    const adminName = getAdminName();
-
-    const reason = prompt("Enter rejection reason:");
-
-    if (reason === null) return;
-
-    if (reason.trim() === "") {
-
-        alert("Rejection reason is required.");
-
-        return;
-
-    }
-
-    try {
-
-        const response = await fetch(`/api/admin/requests/${id}`, {
-
-            method: "PUT",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-body: JSON.stringify({
-
-    status: "Rejected",
-    admin: adminName,
-    reason: reason.trim()
-
-})
-
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || "Rejection failed.");
-        }
-
-        alert("Request rejected successfully.");
-
-        loadRequests();
-
-    }
-    catch (error) {
-
-        console.error(error);
-
-        alert(error.message);
-
-    }
+    document.getElementById("assignModal").style.display="block";
 
 }
 
-// =====================================
-// ASSIGN TRUCK
-// =====================================
 
-async function assignTruck(id) {
+// ===============================
+// SAVE ASSIGNMENT
+// ===============================
+async function saveAssignment(){
 
-    const adminName = getAdminName();
+    const truck =
+        document.getElementById("truckInput").value;
 
-    const input = document.getElementById(`truck-${id}`);
+    const collector =
+        document.getElementById("collectorSelect").value;
 
-    if (!input) {
+    await fetch(`/api/admin/requests/${currentRequestId}`,{
 
-        alert("Truck input not found.");
+        method:"PUT",
 
-        return;
+        headers:{
+            "Content-Type":"application/json"
+        },
 
-    }
+        body:JSON.stringify({
 
-    const truck = input.value.trim();
+            status:"Assigned",
+            truck,
+            assigned_collector:collector
 
-    if (truck === "") {
+        })
 
-        alert("Please enter a truck number.");
+    });
 
-        input.focus();
+    closeAssignModal();
 
-        return;
+    loadStats();
 
-    }
-
-    try {
-
-        const response = await fetch(`/api/admin/requests/${id}`, {
-
-            method: "PUT",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-body: JSON.stringify({
-
-    truck: truck,
-    admin: adminName
-
-})
-
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || "Truck assignment failed.");
-        }
-
-        alert("Truck assigned successfully.");
-
-        loadRequests();
-
-    }
-    catch (error) {
-
-        console.error(error);
-
-        alert(error.message);
-
-    }
+    loadRequests();
 
 }
 
 
-// HAMBURGER MENU
+// ===============================
+function closeAssignModal(){
 
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
+    document.getElementById("assignModal").style.display="none";
 
-menuBtn.onclick = function(){
+}
 
-    sidebar.classList.add("active");
-    overlay.classList.add("active");
 
-};
+// ===============================
+// HAMBURGER
+// ===============================
+function openMenu(){
+
+    document.getElementById("sidebar").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+
+}
 
 function closeMenu(){
 
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
+    document.getElementById("sidebar").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
 
 }
 
 function logout(){
 
-    if(confirm("Are you sure you want to logout?")){
+    if(confirm("Logout?")){
 
         sessionStorage.clear();
 
-        window.location.href="Admin-Login.html";
+        location.href="Admin-Login.html";
 
     }
 
