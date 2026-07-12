@@ -555,7 +555,7 @@ app.get("/api/requests", (req, res) => {
 // ADMIN UPDATE REQUEST
 // =====================
 app.put("/api/admin/requests/:id", (req, res) => {
-
+console.log("******** ADMIN ROUTE EXECUTED ********");
     console.log("==================================");
     console.log("ADMIN UPDATE ROUTE HIT");
     console.log("Request ID:", req.params.id);
