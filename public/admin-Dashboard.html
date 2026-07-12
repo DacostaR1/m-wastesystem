@@ -285,141 +285,233 @@ button{
 }
 
 }
-
-/* ===========================
-   HAMBURGER MENU
-=========================== */
-
-.menu-btn{
-
-position:fixed;
-top:20px;
-left:20px;
-width:50px;
-height:50px;
-
-background:#0a8754;
-color:white;
-
-font-size:28px;
-font-weight:bold;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-border-radius:8px;
-cursor:pointer;
-
-box-shadow:0 5px 15px rgba(0,0,0,.3);
-
-z-index:1001;
-
-transition:.3s;
-
-}
-
-.menu-btn:hover{
-
-background:#076b42;
-
-}
+/* =========================================
+   ADMIN SIDEBAR
+========================================= */
 
 .sidebar{
 
-position:fixed;
+    position:fixed;
+    top:0;
+    left:0;
 
-top:0;
-left:-270px;
+    width:200px;
+    height:100vh;
 
-width:260px;
-height:100%;
+    background:#0f5f3c;
 
-background:#0f5f3c;
+    color:#fff;
 
-padding-top:30px;
+    overflow-y:auto;
 
-transition:.35s;
+    box-shadow:3px 0 12px rgba(0,0,0,.25);
 
-z-index:1002;
-
-box-shadow:4px 0 20px rgba(0,0,0,.3);
-
-}
-
-.sidebar.active{
-
-left:0;
+    z-index:1000;
 
 }
+
+/* Sidebar Title */
 
 .sidebar h2{
 
-color:white;
-text-align:center;
+    margin:0;
+    padding:22px 15px;
 
-margin-bottom:30px;
+    text-align:center;
+
+    font-size:20px;
+    font-weight:bold;
+
+    color:#fff;
+
+    border-bottom:1px solid rgba(255,255,255,.15);
 
 }
 
+/* Navigation */
+
 .sidebar a{
 
-display:block;
+    display:flex;
+    align-items:center;
+    gap:10px;
 
-padding:15px 25px;
+    padding:14px 20px;
 
-color:white;
+    color:#fff;
 
-text-decoration:none;
+    text-decoration:none;
 
-font-size:16px;
+    font-size:15px;
 
-transition:.3s;
+    transition:.25s;
 
 }
 
 .sidebar a:hover{
 
-background:#0a8754;
+    background:#0a8754;
 
-padding-left:35px;
+    padding-left:28px;
 
 }
+
+/* Active Menu */
+
+.sidebar a.active{
+
+    background:#0a8754;
+
+    border-left:4px solid #fff;
+
+    font-weight:bold;
+
+}
+
+/* Divider */
 
 .sidebar hr{
 
-border:none;
+    border:none;
 
-border-top:1px solid rgba(255,255,255,.3);
+    border-top:1px solid rgba(255,255,255,.15);
 
-margin:20px;
+    margin:12px 18px;
 
 }
 
+/* Logout */
+
+.sidebar .logout{
+
+    color:#ffdddd;
+
+}
+
+.sidebar .logout:hover{
+
+    background:#c0392b;
+
+    color:#fff;
+
+}
+
+/* =========================================
+   DASHBOARD CONTENT
+========================================= */
+
+.container{
+
+    margin-left:220px;
+
+    margin-right:20px;
+
+    margin-top:25px;
+
+    width:calc(100% - 240px);
+
+    max-width:none;
+
+}
+
+/* =========================================
+   HAMBURGER BUTTON
+========================================= */
+
+.menu-btn{
+
+    display:none;
+
+    position:fixed;
+
+    top:15px;
+    left:15px;
+
+    width:45px;
+    height:45px;
+
+    background:#0a8754;
+
+    color:#fff;
+
+    font-size:24px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    align-items:center;
+    justify-content:center;
+
+    box-shadow:0 4px 10px rgba(0,0,0,.25);
+
+    z-index:1100;
+
+}
+
+/* =========================================
+   OVERLAY
+========================================= */
+
 .overlay{
 
-display:none;
+    display:none;
 
-position:fixed;
+    position:fixed;
 
-top:0;
-left:0;
+    top:0;
+    left:0;
 
-width:100%;
-height:100%;
+    width:100%;
+    height:100%;
 
-background:rgba(0,0,0,.45);
+    background:rgba(0,0,0,.45);
 
-z-index:1000;
+    z-index:999;
 
 }
 
 .overlay.active{
 
-display:block;
+    display:block;
 
 }
 
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width:768px){
+
+    .menu-btn{
+
+        display:flex;
+
+    }
+
+    .sidebar{
+
+        left:-220px;
+
+        transition:.3s;
+
+    }
+
+    .sidebar.active{
+
+        left:0;
+
+    }
+
+    .container{
+
+        margin:20px auto;
+
+        width:95%;
+
+    }
+
+}
 </style>
 
 </head>
@@ -429,38 +521,27 @@ display:block;
   
 <!-- HAMBURGER MENU -->
 
-
-<div id="menuBtn" class="menu-btn">
-☰ Menu:
+<div class="menu-btn" id="menuBtn">
+☰ Menu
 </div>
 
-<div id="overlay" class="overlay" onclick="closeMenu()"></div>
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
-<div id="sidebar" class="sidebar">
+<div class="sidebar" id="sidebar">
 
-<h2>Admin Menu</h2>
+    <h2>Admin</h2>
 
-<a href="admin-Dashboard.html">
-📊 Dashboard
-</a>
+    <a href="admin-Dashboard.html" class="active">📊 Dashboard</a>
 
-<a href="manage-collectors.html">
-🚮 Manage Collectors
-</a>
+    <a href="manage-collectors.html">👷🚒 Collectors</a>
 
-<a href="admin_Feedback.html">
-💬 Staff Feedback
-</a>
+    <a href="admin_Feedback.html">💬 Feedback</a>
 
-<a href="index.html">
-🏠 Home
-</a>
+    <a href="index.html">🏠 Home</a>
 
-<hr>
+    <hr>
 
-<a href="#" onclick="logout()">
-🚪 Logout
-</a>
+    <a href="#" class="logout" onclick="logout()">🚪 Logout</a>
 
 </div>
 
