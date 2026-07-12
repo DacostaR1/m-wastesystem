@@ -1004,6 +1004,40 @@ app.get("/api/collector/requests", (req, res) => {
 });
 
 
+// =====================
+// COLLECTOR MARK COMPLETE /complete the collection.
+// =====================
+app.put("/api/collector/requests/:id/complete", (req, res) => {
+
+    const id = req.params.id;
+
+    db.query(
+        "UPDATE requests SET status='Completed' WHERE id=?",
+        [id],
+        (err, result) => {
+
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    message: "Database error"
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: "Request not found"
+                });
+            }
+
+            res.json({
+                success: true,
+                message: "Collection completed."
+            });
+
+        }
+    );
+
+});
 
 // START SERVER //
 
