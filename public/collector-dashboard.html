@@ -168,10 +168,12 @@ Loading assigned requests...
 
 <script>
 
-const collector = sessionStorage.getItem("collector_name");
+const collectorId = sessionStorage.getItem("collector_id");
+const collectorName = sessionStorage.getItem("collector_name");
+
 document.getElementById("collectorWelcome").innerHTML =
 `
-Welcome, <strong>${collector}</strong>
+Welcome, <strong>${collectorName}</strong>
 `;
 
 console.log("Logged collector:", collector);
@@ -184,9 +186,9 @@ async function loadStats() {
 
     try {
 
-        const res = await fetch(
-            `/api/collector/requests?collector=${encodeURIComponent(collector)}`
-        );
+  const res = await fetch(
+    `/api/collector/requests?collector=${collectorId}`
+);
 
         const data = await res.json();
 
@@ -241,11 +243,9 @@ async function loadRequests() {
 
 
     try {
-
-
-        const res = await fetch(
-            `/api/collector/requests?collector=${encodeURIComponent(collector)}`
-        );
+const res = await fetch(
+    `/api/collector/requests?collector=${collectorId}`
+);
 
 
         const data = await res.json();

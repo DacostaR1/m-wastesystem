@@ -313,7 +313,7 @@ app.post("/api/login", (req, res) => {
                         message: "Wrong password"
                     });
                 }
-                
+
 return res.json({
     role: "admin",
     user: {
@@ -975,34 +975,26 @@ app.delete("/api/collectors/:id", (req, res) => {
 // =====================
 app.get("/api/collector/requests", (req, res) => {
 
-    const collector = req.query.collector;
+    const collectorId = req.query.collector;
 
-    console.log("Collector requesting:", collector);
-
-
-    if (!collector) {
+    if (!collectorId) {
         return res.status(400).json({
-            message: "Collector name missing"
+            message: "Collector ID missing"
         });
     }
 
-
     db.query(
-        "SELECT * FROM requests WHERE assigned_collector = ? ORDER BY id DESC",
-        [collector],
+        `SELECT * FROM requests
+         WHERE assigned_collector = ?
+         ORDER BY id DESC`,
+        [collectorId],
         (err, rows) => {
 
-
             if (err) {
-
-                console.error(err);
-
                 return res.status(500).json({
-                    message:"Database error"
+                    message: "Database error"
                 });
-
             }
-
 
             res.json(rows);
 
@@ -1010,6 +1002,8 @@ app.get("/api/collector/requests", (req, res) => {
     );
 
 });
+
+
 
 // START SERVER //
 
