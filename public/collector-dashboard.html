@@ -151,6 +151,8 @@ grid-template-columns:1fr;
 
 <h2>Waste Collector Dashboard</h2>
 
+<p id="collectorWelcome"></p>
+
 <p>
 Welcome. Below are your assigned waste collection requests.
 After collecting the waste, click <strong>Mark Complete</strong>.
@@ -167,6 +169,10 @@ Loading assigned requests...
 <script>
 
 const collector = sessionStorage.getItem("collector_name");
+document.getElementById("collectorWelcome").innerHTML =
+`
+Welcome, <strong>${collector}</strong>
+`;
 
 console.log("Logged collector:", collector);
 
