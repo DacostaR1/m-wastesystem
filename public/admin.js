@@ -309,3 +309,36 @@ body: JSON.stringify({
     }
 
 }
+
+
+// HAMBURGER MENU
+
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+menuBtn.onclick = function(){
+
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+
+};
+
+function closeMenu(){
+
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+
+}
+
+function logout(){
+
+    if(confirm("Are you sure you want to logout?")){
+
+        sessionStorage.clear();
+
+        window.location.href="Admin-Login.html";
+
+    }
+
+}
