@@ -26,27 +26,64 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ===============================
-// LOAD STATS
-// ===============================
-async function loadStats() {
+
+// LOAD STATS (Admin Dashboard)
+
+
+async function loadStats(){
 
     const res = await fetch("/api/requests");
     const data = await res.json();
 
-    const pending = data.filter(r => (r.status || "").toLowerCase() === "pending").length;
-    const approved = data.filter(r => (r.status || "").toLowerCase() === "approved").length;
-    const rejected = data.filter(r => (r.status || "").toLowerCase() === "rejected").length;
-    const assigned = data.filter(r => (r.status || "").toLowerCase() === "assigned").length;
+    const pending = data.filter(r =>
+        (r.status || "").toLowerCase() === "pending"
+    ).length;
 
-    stats.innerHTML = `
-        <div class="box">Pending<br><br>${pending}</div>
-        <div class="box">Approved<br><br>${approved}</div>
-        <div class="box">Rejected<br><br>${rejected}</div>
-        <div class="box">Assigned<br><br>${assigned}</div>
+    const approved = data.filter(r =>
+        (r.status || "").toLowerCase() === "approved"
+    ).length;
+
+    const assigned = data.filter(r =>
+        (r.status || "").toLowerCase() === "assigned"
+    ).length;
+
+    const completed = data.filter(r =>
+        (r.status || "").toLowerCase() === "completed"
+    ).length;
+
+    const rejected = data.filter(r =>
+        (r.status || "").toLowerCase() === "rejected"
+    ).length;
+
+    document.getElementById("stats").innerHTML = `
+
+        <div class="box pending">
+            <h3>${pending}</h3>
+            <p>Pending</p>
+        </div>
+
+        <div class="box approved">
+            <h3>${approved}</h3>
+            <p>Approved</p>
+        </div>
+
+        <div class="box assigned">
+            <h3>${assigned}</h3>
+            <p>Assigned</p>
+        </div>
+
+        <div class="box completed">
+            <h3>${completed}</h3>
+            <p>Completed</p>
+        </div>
+
+        <div class="box rejected">
+            <h3>${rejected}</h3>
+            <p>Rejected</p>
+        </div>
+
     `;
 }
-
 
 // ===============================
 // LOAD REQUESTS

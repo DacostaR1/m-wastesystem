@@ -71,6 +71,30 @@ h2{
 
 /* STATISTICS (Dashboard) css   */
 
+.stats{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+@media(max-width:1100px){
+    .stats{
+        grid-template-columns:repeat(3,1fr);
+    }
+}
+
+@media(max-width:768px){
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+}
+
+@media(max-width:480px){
+    .stats{
+        grid-template-columns:1fr;
+    }
+}
 
 .stats{
     display:grid;
@@ -285,6 +309,45 @@ button{
 }
 
 }
+.box{
+    color:#fff;
+    padding:18px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+.box h3{
+    font-size:30px;
+    margin-bottom:8px;
+}
+
+.box p{
+    color:#fff;
+    margin:0;
+    font-weight:bold;
+}
+
+.pending{
+    background:#f39c12;
+}
+
+.approved{
+    background:#92eab7;
+}
+
+.assigned{
+    background:#3498db;
+}
+
+.completed{
+    background:#16a085;
+}
+
+.rejected{
+    background:#e74c3c;
+}
+
 /* =========================================
    ADMIN SIDEBAR
 ========================================= */
@@ -533,7 +596,7 @@ button{
 
     <a href="admin-Dashboard.html" class="active">📊 Dashboard</a>
 
-    <a href="manage-collectors.html">👷🚒 Collectors</a>
+    <a href="manage-collectors.html">👷🚒 Collectors [Drivers]</a>
 
     <a href="admin_Feedback.html">💬 Feedback</a>
 
