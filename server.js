@@ -625,50 +625,52 @@ console.log("******** ADMIN ROUTE EXECUTED ********");
   const { status, truck, admin, reason, remarks , assigned_collector } = req.body;
 const requestId = req.params.id;
 
-    let sql = "UPDATE requests SET ";
-    let values = [];
+let fields = [];
+let values = [];
 
-    if (status !== undefined) {
-        sql += "status=?, ";
-        values.push(status);
-    }
+if (status !== undefined) {
+    fields.push("status=?");
+    values.push(status);
+}
 
-    if (truck !== undefined) {
-        sql += "assigned_truck=?, ";
-        values.push(truck);
-    }
+if (truck !== undefined) {
+    fields.push("assigned_truck=?");
+    values.push(truck);
+}
 
-    if (admin !== undefined) {
-        sql += "action_by=?, ";
-        values.push(admin);
-    }
-
-    if (remarks !== undefined) {
-        sql += "approver_remarks=?, ";
-        values.push(remarks);
-    }
-
-    if (reason !== undefined) {
-        sql += "rejection_reason=?, ";
-        values.push(reason);
-    }
-
-    // Nothing to update
-    if (values.length === 0) {
-        return res.status(400).json({
-            message: "No update data supplied."
-        });
-    }
-
-    sql = sql.replace(/, $/, "");
-    
 if (assigned_collector !== undefined) {
-    sql += "assigned_collector=?, ";
+    fields.push("assigned_collector=?");
     values.push(assigned_collector);
 }
-    sql += " WHERE id=?";
-    values.push(requestId);
 
+if (admin !== undefined) {
+    fields.push("action_by=?");
+    values.push(admin);
+}
+
+if (remarks !== undefined) {
+    fields.push("approver_remarks=?");
+    values.push(remarks);
+}
+
+if (reason !== undefined) {
+    fields.push("rejection_reason=?");
+    values.push(reason);
+}
+
+if (fields.length === 0) {
+    return res.status(400).json({
+        message: "No update data supplied."
+    });
+}
+
+const sql = `
+UPDATE requests
+SET ${fields.join(", ")}
+WHERE id=?
+`;
+
+values.push(requestId);
     console.log("SQL:", sql);
     console.log("VALUES:", values);
 
