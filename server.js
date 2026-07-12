@@ -314,14 +314,15 @@ app.post("/api/login", (req, res) => {
                     });
                 }
 
-                return res.json({
-                    token: "admin",
-                    role: "admin",
-                    user: {
-                        id: admin.id,
-                        username: admin.username
-                    }
-                });
+                return 
+           res.json({
+    role: "admin",
+    user: {
+        id: admin.id,
+        username: admin.username,
+        full_name: admin.full_name
+    }
+});
 
             }
 
