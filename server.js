@@ -313,9 +313,8 @@ app.post("/api/login", (req, res) => {
                         message: "Wrong password"
                     });
                 }
-
-                return 
-           res.json({
+                
+return res.json({
     role: "admin",
     user: {
         id: admin.id,
