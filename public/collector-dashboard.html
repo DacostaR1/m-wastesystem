@@ -166,6 +166,7 @@ Loading assigned requests...
 
 </div>
 
+
 <script>
 
 const collectorId = sessionStorage.getItem("collector_id");
@@ -176,7 +177,8 @@ document.getElementById("collectorWelcome").innerHTML =
 Welcome, <strong>${collectorName}</strong>
 `;
 
-console.log("Logged collector:", collector);
+console.log("Logged collector:", collectorName);
+console.log("Collector ID:", collectorId);
 
 
 // =====================
