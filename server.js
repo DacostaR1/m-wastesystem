@@ -611,9 +611,7 @@ app.get("/api/requests", (req, res) => {
 
 //Admin Actions ROUTE
 
-// =====================
-// ADMIN UPDATE REQUEST
-// =====================
+
 app.put("/api/admin/requests/:id", (req, res) => {
 console.log("******** ADMIN ROUTE EXECUTED ********");
     console.log("==================================");
@@ -973,7 +971,41 @@ app.delete("/api/collectors/:id", (req, res) => {
 
 });
 
+// =====================
+// GET COLLECTOR ASSIGNED REQUESTS
+// =====================
+app.get("/api/collector/requests", (req, res) => {
 
+    const collector = req.query.collector;
+
+    if (!collector) {
+        return res.status(400).json({
+            message: "Collector required"
+        });
+    }
+
+    const sql = `
+        SELECT *
+        FROM requests
+        WHERE assigned_collector = ?
+        ORDER BY id DESC
+    `;
+
+    db.query(sql, [collector], (err, rows) => {
+
+        if (err) {
+            console.error(err);
+
+            return res.status(500).json({
+                message: "Failed to load collector requests"
+            });
+        }
+
+        res.json(rows);
+
+    });
+
+});
 
 // START SERVER //
 

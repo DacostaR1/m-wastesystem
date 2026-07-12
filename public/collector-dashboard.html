@@ -166,150 +166,260 @@ Loading assigned requests...
 
 <script>
 
-async function loadStats(){
+const collector = sessionStorage.getItem("collector_name");
 
-try{
+if (!collector) {
+    alert("Collector session expired. Please login again.");
+    window.location.href = "collector-login.html";
+}
 
-const res = await fetch("/api/collector/requests");
 
-const data = await res.json();
+// =====================
+// LOAD DASHBOARD STATS
+// =====================
+async function loadStats() {
 
-const assigned = data.filter(r => (r.status || "").toLowerCase()=="assigned").length;
+    try {
 
-const completed = data.filter(r => (r.status || "").toLowerCase()=="completed").length;
+        const res = await fetch(
+            `/api/collector/requests?collector=${encodeURIComponent(collector)}`
+        );
 
-document.getElementById("stats").innerHTML=`
+        const data = await res.json();
 
-<div class="box">
-Assigned Requests
-<br><br>
-${assigned}
-</div>
 
-<div class="box">
-Completed Requests
-<br><br>
-${completed}
-</div>
+        const assigned = data.filter(r =>
+            (r.status || "").toLowerCase() === "assigned"
+        ).length;
 
-`;
 
-}catch{
+        const completed = data.filter(r =>
+            (r.status || "").toLowerCase() === "completed"
+        ).length;
 
-document.getElementById("stats").innerHTML="Unable to load statistics.";
+
+        document.getElementById("stats").innerHTML = `
+
+            <div class="box">
+                Assigned Requests
+                <br><br>
+                ${assigned}
+            </div>
+
+
+            <div class="box">
+                Completed Requests
+                <br><br>
+                ${completed}
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("stats").innerHTML =
+        "Unable to load statistics.";
+
+    }
 
 }
 
+
+
+// =====================
+// LOAD COLLECTOR REQUESTS
+// =====================
+async function loadRequests() {
+
+    const grid = document.getElementById("grid");
+
+
+    try {
+
+
+        const res = await fetch(
+            `/api/collector/requests?collector=${encodeURIComponent(collector)}`
+        );
+
+
+        const data = await res.json();
+
+
+        grid.innerHTML = "";
+
+
+        if (data.length === 0) {
+
+            grid.innerHTML =
+            "<h3>No assigned requests.</h3>";
+
+            return;
+
+        }
+
+
+
+        data.forEach(r => {
+
+
+            let statusClass =
+            (r.status || "").toLowerCase() === "completed"
+            ? "completed"
+            : "assigned";
+
+
+
+            grid.innerHTML += `
+
+            <div class="card">
+
+
+                <p><b>Resident:</b> ${r.name}</p>
+
+                <p><b>Location:</b> ${r.location}</p>
+
+                <p><b>Phone:</b> ${r.phone}</p>
+
+                <p><b>Waste Type:</b> ${r.wasteType}</p>
+
+                <p><b>Truck:</b> ${r.assigned_truck || "-"}</p>
+
+
+                <p>
+
+                    <span class="status ${statusClass}">
+                        ${r.status}
+                    </span>
+
+                </p>
+
+
+
+                ${
+                    r.status.toLowerCase() !== "completed"
+                    ?
+
+                    `
+                    <div class="actions">
+
+                        <button onclick="completeRequest(${r.id})">
+                            Mark Complete
+                        </button>
+
+                    </div>
+                    `
+
+                    :
+
+                    `
+                    <p style="color:green;font-weight:bold;">
+                        Collection Completed
+                    </p>
+                    `
+
+                }
+
+
+            </div>
+
+            `;
+
+
+        });
+
+
+
+    } catch(error) {
+
+
+        console.error(error);
+
+        grid.innerHTML =
+        "Failed to load requests.";
+
+    }
+
+
 }
 
-async function loadRequests(){
 
-const grid=document.getElementById("grid");
 
-try{
+// =====================
+// MARK REQUEST COMPLETE
+// =====================
+async function completeRequest(id) {
 
-const res=await fetch("/api/collector/requests");
 
-const data=await res.json();
+    if (!confirm("Confirm waste has been collected?")) {
+        return;
+    }
 
-grid.innerHTML="";
 
-if(data.length===0){
 
-grid.innerHTML="<h3>No assigned requests.</h3>";
+    try {
 
-return;
 
-}
+        const response = await fetch(
+            `/api/collector/requests/${id}/complete`,
+            {
+                method:"PUT"
+            }
+        );
 
-data.forEach(r=>{
 
-grid.innerHTML+=`
 
-<div class="card">
+        const result = await response.json();
 
-<p><b>Resident:</b> ${r.name}</p>
 
-<p><b>Location:</b> ${r.location}</p>
 
-<p><b>Phone:</b> ${r.phone}</p>
+        if (!response.ok) {
 
-<p><b>Waste Type:</b> ${r.wasteType}</p>
+            alert(result.message || "Failed");
 
-<p><b>Truck:</b> ${r.assigned_truck || "-"}</p>
+            return;
 
-<p>
+        }
 
-<span class="status assigned">
 
-${r.status}
 
-</span>
+        alert("Collection completed successfully.");
 
-</p>
+        loadRequests();
 
-<div class="actions">
+        loadStats();
 
-<button onclick="completeRequest(${r.id})">
 
-Mark Complete
 
-</button>
+    } catch(error) {
 
-</div>
 
-</div>
+        console.error(error);
 
-`;
+        alert("Server error.");
 
-});
+    }
 
-}catch{
-
-grid.innerHTML="Failed to load requests.";
 
 }
 
-}
 
-async function completeRequest(id){
 
-if(!confirm("Confirm waste has been collected?"))
-return;
+// =====================
+// START DASHBOARD
+// =====================
+window.onload = function() {
 
-const response=await fetch(`/api/collector/requests/${id}/complete`,{
+    loadStats();
 
-method:"PUT"
-
-});
-
-const result=await response.json();
-
-if(!response.ok){
-
-alert(result.message);
-
-return;
-
-}
-
-alert("Collection completed successfully.");
-
-loadRequests();
-
-loadStats();
-
-}
-
-window.onload=function(){
-
-loadStats();
-
-loadRequests();
+    loadRequests();
 
 };
 
 </script>
+
 
 <footer>
 
