@@ -970,40 +970,44 @@ app.delete("/api/collectors/:id", (req, res) => {
     );
 
 });
-
 // =====================
-// GET COLLECTOR ASSIGNED REQUESTS
+// COLLECTOR REQUESTS
 // =====================
 app.get("/api/collector/requests", (req, res) => {
 
     const collector = req.query.collector;
 
+    console.log("Collector requesting:", collector);
+
+
     if (!collector) {
         return res.status(400).json({
-            message: "Collector required"
+            message: "Collector name missing"
         });
     }
 
-    const sql = `
-        SELECT *
-        FROM requests
-        WHERE assigned_collector = ?
-        ORDER BY id DESC
-    `;
 
-    db.query(sql, [collector], (err, rows) => {
+    db.query(
+        "SELECT * FROM requests WHERE assigned_collector = ? ORDER BY id DESC",
+        [collector],
+        (err, rows) => {
 
-        if (err) {
-            console.error(err);
 
-            return res.status(500).json({
-                message: "Failed to load collector requests"
-            });
+            if (err) {
+
+                console.error(err);
+
+                return res.status(500).json({
+                    message:"Database error"
+                });
+
+            }
+
+
+            res.json(rows);
+
         }
-
-        res.json(rows);
-
-    });
+    );
 
 });
 
