@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Collectors</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0a8754,#0f5f3c);
+    min-height:100vh;
+}
+
+.container{
+    width:95%;
+    max-width:1000px;
+    margin:30px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 8px 20px rgba(0,0,0,.2);
+}
+
+h2{
+    text-align:center;
+    color:#0a8754;
+    margin-bottom:20px;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:bold;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+button{
+    padding:10px 18px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    color:#fff;
+    font-size:15px;
+}
+
+.save{
+    background:#0a8754;
+}
+
+.save:hover{
+    background:#076b42;
+}
+
+.delete{
+    background:#dc3545;
+}
+
+.delete:hover{
+    background:#b52a37;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:30px;
+}
+
+table th{
+    background:#0a8754;
+    color:white;
+    padding:12px;
+}
+
+table td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+table tr:nth-child(even){
+    background:#f5f5f5;
+}
+
+.top-links{
+    margin-top:20px;
+}
+
+.top-links a{
+    text-decoration:none;
+    color:#0a8754;
+    font-weight:bold;
+    margin-right:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Manage Waste Collectors</h2>
+
+<div class="form-group">
+<label>Full Name</label>
+<input type="text" id="full_name">
+</div>
+
+<div class="form-group">
+<label>Username</label>
+<input type="text" id="username">
+</div>
+
+<div class="form-group">
+<label>Phone Number</label>
+<input type="text" id="phone">
+</div>
+
+<div class="form-group">
+<label>Password</label>
+<input type="password" id="password">
+</div>
+
+<button class="save" onclick="saveCollector()">
+Save Collector
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Name</th>
+<th>Username</th>
+<th>Phone</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="collectorTable">
+
+<tr>
+
+<td colspan="6">
+
+Loading...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+<div class="top-links">
+
+<a href="Admin-Dashboard.html">
+← Back to Dashboard
+</a>
+
+</div>
+
+</div>
+
+<script>
+
+async function loadCollectors(){
+
+const res=await fetch("/api/collectors");
+
+const data=await res.json();
+
+const table=document.getElementById("collectorTable");
+
+table.innerHTML="";
+
+if(data.length===0){
+
+table.innerHTML="<tr><td colspan='6'>No collectors found.</td></tr>";
+
+return;
+
+}
+
+data.forEach(c=>{
+
+table.innerHTML+=`
+
+<tr>
+
+<td>${c.id}</td>
+
+<td>${c.full_name}</td>
+
+<td>${c.username}</td>
+
+<td>${c.phone||"-"}</td>
+
+<td>${c.status}</td>
+
+<td>
+
+<button
+class="delete"
+onclick="deleteCollector(${c.id})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+async function saveCollector(){
+
+const response=await fetch("/api/collectors",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+full_name:
+document.getElementById("full_name").value,
+
+username:
+document.getElementById("username").value,
+
+phone:
+document.getElementById("phone").value,
+
+password:
+document.getElementById("password").value
+
+})
+
+});
+
+const result=await response.json();
+
+alert(result.message);
+
+document.getElementById("full_name").value="";
+document.getElementById("username").value="";
+document.getElementById("phone").value="";
+document.getElementById("password").value="";
+
+loadCollectors();
+
+}
+
+async function deleteCollector(id){
+
+if(!confirm("Delete this collector?"))
+return;
+
+const response=await fetch(`/api/collectors/${id}`,{
+
+method:"DELETE"
+
+});
+
+const result=await response.json();
+
+alert(result.message);
+
+loadCollectors();
+
+}
+
+window.onload=loadCollectors;
+
+</script>
+
+</body>
+</html>

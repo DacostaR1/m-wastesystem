@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Waste Collector Dashboard</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0a8754,#0f5f3c);
+    min-height:100vh;
+}
+
+.container{
+    width:95%;
+    max-width:1200px;
+    margin:30px auto;
+    background:rgba(255,255,255,.97);
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 8px 25px rgba(0,0,0,.2);
+}
+
+h2{
+    text-align:center;
+    color:#0a8754;
+    margin-bottom:10px;
+}
+
+.container p{
+    text-align:center;
+    color:#555;
+    margin-bottom:15px;
+    line-height:1.6;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.box{
+    background:#0a8754;
+    color:white;
+    padding:20px;
+    text-align:center;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:bold;
+    box-shadow:0 3px 8px rgba(0,0,0,.2);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#fff;
+    border-left:6px solid #0a8754;
+    border-radius:10px;
+    padding:18px;
+    box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+
+.card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
+}
+
+.card p{
+    text-align:left;
+    margin:8px 0;
+    color:#333;
+}
+
+.status{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:20px;
+    color:white;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.assigned{
+    background:#007bff;
+}
+
+.completed{
+    background:#28a745;
+}
+
+.actions{
+    margin-top:15px;
+}
+
+button{
+    width:100%;
+    border:none;
+    background:#28a745;
+    color:white;
+    padding:12px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:15px;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+footer{
+    text-align:center;
+    color:white;
+    margin-top:25px;
+    padding-bottom:20px;
+}
+
+@media(max-width:768px){
+
+.stats{
+grid-template-columns:1fr;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Waste Collector Dashboard</h2>
+
+<p>
+Welcome. Below are your assigned waste collection requests.
+After collecting the waste, click <strong>Mark Complete</strong>.
+</p>
+
+<div id="stats" class="stats"></div>
+
+<div id="grid" class="grid">
+Loading assigned requests...
+</div>
+
+</div>
+
+<script>
+
+async function loadStats(){
+
+try{
+
+const res = await fetch("/api/collector/requests");
+
+const data = await res.json();
+
+const assigned = data.filter(r => (r.status || "").toLowerCase()=="assigned").length;
+
+const completed = data.filter(r => (r.status || "").toLowerCase()=="completed").length;
+
+document.getElementById("stats").innerHTML=`
+
+<div class="box">
+Assigned Requests
+<br><br>
+${assigned}
+</div>
+
+<div class="box">
+Completed Requests
+<br><br>
+${completed}
+</div>
+
+`;
+
+}catch{
+
+document.getElementById("stats").innerHTML="Unable to load statistics.";
+
+}
+
+}
+
+async function loadRequests(){
+
+const grid=document.getElementById("grid");
+
+try{
+
+const res=await fetch("/api/collector/requests");
+
+const data=await res.json();
+
+grid.innerHTML="";
+
+if(data.length===0){
+
+grid.innerHTML="<h3>No assigned requests.</h3>";
+
+return;
+
+}
+
+data.forEach(r=>{
+
+grid.innerHTML+=`
+
+<div class="card">
+
+<p><b>Resident:</b> ${r.name}</p>
+
+<p><b>Location:</b> ${r.location}</p>
+
+<p><b>Phone:</b> ${r.phone}</p>
+
+<p><b>Waste Type:</b> ${r.wasteType}</p>
+
+<p><b>Truck:</b> ${r.assigned_truck || "-"}</p>
+
+<p>
+
+<span class="status assigned">
+
+${r.status}
+
+</span>
+
+</p>
+
+<div class="actions">
+
+<button onclick="completeRequest(${r.id})">
+
+Mark Complete
+
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}catch{
+
+grid.innerHTML="Failed to load requests.";
+
+}
+
+}
+
+async function completeRequest(id){
+
+if(!confirm("Confirm waste has been collected?"))
+return;
+
+const response=await fetch(`/api/collector/requests/${id}/complete`,{
+
+method:"PUT"
+
+});
+
+const result=await response.json();
+
+if(!response.ok){
+
+alert(result.message);
+
+return;
+
+}
+
+alert("Collection completed successfully.");
+
+loadRequests();
+
+loadStats();
+
+}
+
+window.onload=function(){
+
+loadStats();
+
+loadRequests();
+
+};
+
+</script>
+
+<footer>
+
+<p>© 2026 Mobile Waste Collection System Rubaga</p>
+
+<p>Developed by VU Finalist 2026 Team</p>
+
+</footer>
+
+</body>
+</html>

@@ -280,38 +280,98 @@ err.message
 
 });
 
-// =====================
-// ADMIN LOGIN
-// =====================
-app.post("/api/admin/login", (req, res) => {
-  const { username, password } = req.body;
 
-  db.query(
-    "SELECT * FROM admins WHERE username = ?",
-    [username],
-    async (err, rows) => {
-      if (err) return res.status(500).json(err);
 
-      if (rows.length === 0) {
-        return res.status(401).json({ message: "Invalid admin" });
-      }
+// SYSTEM LOGIN (ADMIN + COLLECTOR)
 
-      const admin = rows[0];
-      const ok = await bcrypt.compare(password, admin.password_hash);
 
-      if (!ok) {
-        return res.status(401).json({ message: "Wrong password" });
-      }
+st("/api/login", (req, res) => {
 
-      res.json({
-        message: "Admin login success",
-        admin: {
-          id: admin.id,
-          username: admin.username
+    const { username, password } = req.body;
+
+    // Check Admins first
+    db.query(
+        "SELECT * FROM admins WHERE username = ?",
+        [username],
+        async (err, rows) => {
+
+            if (err) {
+                return res.status(500).json({ message: "Database error" });
+            }
+
+            if (rows.length > 0) {
+
+                const admin = rows[0];
+
+                const ok = await bcrypt.compare(
+                    password,
+                    admin.password_hash
+                );
+
+                if (!ok) {
+                    return res.status(401).json({
+                        message: "Wrong password"
+                    });
+                }
+
+                return res.json({
+                    token: "admin",
+                    role: "admin",
+                    user: {
+                        id: admin.id,
+                        username: admin.username
+                    }
+                });
+
+            }
+
+            // Not an admin, check collectors
+            db.query(
+                "SELECT * FROM collectors WHERE username = ? AND status='active'",
+                [username],
+                async (err, rows) => {
+
+                    if (err) {
+                        return res.status(500).json({
+                            message: "Database error"
+                        });
+                    }
+
+                    if (rows.length === 0) {
+                        return res.status(401).json({
+                            message: "Invalid username or password"
+                        });
+                    }
+
+                    const collector = rows[0];
+
+                    const ok = await bcrypt.compare(
+                        password,
+                        collector.password_hash
+                    );
+
+                    if (!ok) {
+                        return res.status(401).json({
+                            message: "Wrong password"
+                        });
+                    }
+
+                    return res.json({
+                        token: "collector",
+                        role: "collector",
+                        user: {
+                            id: collector.id,
+                            username: collector.username,
+                            full_name: collector.full_name
+                        }
+                    });
+
+                }
+            );
+
         }
-      });
-    }
-  );
+    );
+
 });
 
 // =====================
@@ -760,6 +820,152 @@ app.put("/api/requests/:id", (req, res) => {
   });
 });
 
+
+// =====================
+// GET ALL COLLECTORS
+// =====================
+app.get("/api/collectors", (req, res) => {
+
+    db.query(
+        "SELECT id, full_name, username, phone, status, created_at FROM collectors ORDER BY id DESC",
+        (err, rows) => {
+
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    message: "Failed to load collectors."
+                });
+            }
+
+            res.json(rows);
+
+        }
+    );
+
+});
+
+
+// =====================
+// ADD COLLECTOR
+// =====================
+app.post("/api/collectors", async (req, res) => {
+
+    const {
+        full_name,
+        username,
+        phone,
+        password
+    } = req.body;
+
+    if (!full_name || !username || !password) {
+        return res.status(400).json({
+            message: "Please fill all required fields."
+        });
+    }
+
+    try {
+
+        db.query(
+            "SELECT id FROM collectors WHERE username=?",
+            [username],
+            async (err, rows) => {
+
+                if (err) {
+                    return res.status(500).json({
+                        message: "Database error."
+                    });
+                }
+
+                if (rows.length > 0) {
+                    return res.status(400).json({
+                        message: "Username already exists."
+                    });
+                }
+
+                const hash = await bcrypt.hash(password, 10);
+
+                db.query(
+
+                    `INSERT INTO collectors
+                    (full_name, username, password_hash, phone, status)
+                    VALUES (?, ?, ?, ?, 'active')`,
+
+                    [
+                        full_name,
+                        username,
+                        hash,
+                        phone || null
+                    ],
+
+                    (err, result) => {
+
+                        if (err) {
+                            console.error(err);
+                            return res.status(500).json({
+                                message: "Failed to save collector."
+                            });
+                        }
+
+                        res.json({
+                            message: "Collector added successfully.",
+                            id: result.insertId
+                        });
+
+                    }
+
+                );
+
+            }
+
+        );
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            message: "Server error."
+        });
+
+    }
+
+});
+
+// =====================
+// DELETE COLLECTOR
+// =====================
+app.delete("/api/collectors/:id", (req, res) => {
+
+    db.query(
+
+        "DELETE FROM collectors WHERE id=?",
+
+        [req.params.id],
+
+        (err, result) => {
+
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    message: "Delete failed."
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: "Collector not found."
+                });
+            }
+
+            res.json({
+                message: "Collector deleted successfully."
+            });
+
+        }
+
+    );
+
+});
 
 
 

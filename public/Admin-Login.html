@@ -5,7 +5,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Login</title>
+<title>Staff Login </title>
 
 <style>
     
@@ -112,8 +112,8 @@ nav a {
 <h2>Admin Login</h2>
 
 <p class="info">
-Only administrators can log in here. If you are not a staff, 
-Kindly go to Home Page and login from the main page to request for waste collection services.
+Administrators and Waste Collectors can log in using their assigned username and password.
+Requestor /Residents should return to the Home page to submit waste collection requests.
 </p>
 
 <form id="adminLoginForm">
@@ -124,7 +124,7 @@ Kindly go to Home Page and login from the main page to request for waste collect
 <label>Password</label>
  <input id="adminPass" type="password" required>
 
-<button type="submit">Login as Admin</button>
+<button type="submit">Login </button>
 
 </form>
 
@@ -154,7 +154,7 @@ e.preventDefault();
 
 try {
 
-const res = await fetch("/api/admin/login", {
+const res = await fetch("/api/login", {
 method: "POST",
 headers: {"Content-Type": "application/json"},
 body: JSON.stringify({
@@ -171,15 +171,30 @@ return;
 }
 
 sessionStorage.setItem(
-    "loggedAdmin",
-    JSON.stringify(data.admin)
+    "loggedUser",
+    JSON.stringify(data.user)
+);
+
+sessionStorage.setItem(
+    "userRole",
+    data.role
 );
 
 popup("Login successful");
 
 setTimeout(() => {
-window.location.href = "admin-Dashboard.html";
-}, 1500);
+
+    if(data.role === "admin"){
+
+        window.location.href = "Admin-Dashboard.html";
+
+    }else{
+
+        window.location.href = "collector-dashboard.html";
+
+    }
+
+},1500);
 
 } catch (err) {
 popup("Server not reachable");
