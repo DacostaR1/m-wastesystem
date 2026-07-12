@@ -556,6 +556,12 @@ app.get("/api/requests", (req, res) => {
 // =====================
 app.put("/api/admin/requests/:id", (req, res) => {
 
+    console.log("==================================");
+    console.log("ADMIN UPDATE ROUTE HIT");
+    console.log("Request ID:", req.params.id);
+    console.log("Body:", req.body);
+    console.log("==================================");
+
   const { status, truck, admin, reason, remarks } = req.body;
 const requestId = req.params.id;
 
@@ -594,7 +600,6 @@ const requestId = req.params.id;
         });
     }
 
-    // Remove trailing comma
     sql = sql.replace(/, $/, "");
 
     sql += " WHERE id=?";
@@ -647,6 +652,7 @@ const requestId = req.params.id;
                     if (status === "Approved") {
 
                         await sendNotification(
+                          
                             customer.email,
                             "Waste Collection Request Approved",
                             `
