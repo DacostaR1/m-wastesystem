@@ -294,6 +294,7 @@ button{
 <div class="container">
 
 <h2>Waste Management Admin Dashboard</h2>
+<p id="adminWelcome"></p>
 <p>
 This dashboard provides a centralized platform for managing waste collection operations.
  Administrators can view, track,approve, rejecct and assign trucks efficiently.
@@ -316,6 +317,17 @@ This dashboard provides a centralized platform for managing waste collection ope
 // =====================
 // LOAD STATS
 // =====================
+
+const user = JSON.parse(sessionStorage.getItem("loggedUser"));
+
+if (user) {
+    document.getElementById("adminWelcome").innerHTML =
+        `Welcome, <strong>${user.full_name}</strong>`;
+} else {
+    document.getElementById("adminWelcome").innerHTML =
+        "Welcome, Administrator";
+}
+
 async function loadStats(){
 
 const res = await fetch("/api/requests");
