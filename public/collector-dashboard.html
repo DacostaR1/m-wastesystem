@@ -168,10 +168,7 @@ Loading assigned requests...
 
 const collector = sessionStorage.getItem("collector_name");
 
-if (!collector) {
-    alert("Collector session expired. Please login again.");
-    window.location.href = "collector-login.html";
-}
+console.log("Logged collector:", collector);
 
 
 // =====================
