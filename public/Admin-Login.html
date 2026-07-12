@@ -1,208 +1,378 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Staff Login </title>
+
+<title>Staff Login</title>
 
 <style>
-    
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0a8754, #0f5f3c);
+
+*{
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:linear-gradient(135deg,#0a8754,#0f5f3c);
 }
 
 
-#popup {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #ffffff;
-    color: #0a8754;
-    padding: 12px 20px;
-    border-radius: 8px;
-    display: none;
-    z-index: 9999;
-    font-weight: bold;
+#popup{
+    position:fixed;
+    top:20px;
+    right:20px;
+    background:white;
+    color:#0a8754;
+    padding:12px 20px;
+    border-radius:8px;
+    display:none;
+    font-weight:bold;
+    z-index:9999;
 }
 
 
-.container {
-    width: 100%;
-    max-width: 420px;
-    margin: 70px auto;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    backdrop-filter: blur(6px);
+.container{
+
+    width:90%;
+    max-width:420px;
+    margin:70px auto;
+    background:white;
+    padding:25px;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+
 }
 
 
-h2 {
-    text-align: center;
-    color: #0a8754;
-}
-
-.info {
-    font-size: 14px;
-    background: #e6f7ee;
-    padding: 10px;
-    border-left: 4px solid #0a8754;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    color: #2d2d2d;
+h2{
+    text-align:center;
+    color:#0a8754;
 }
 
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    outline: none;
-}
+.info{
 
-input:focus {
-    border-color: #0a8754;
-    box-shadow: 0 0 5px rgba(10,135,84,0.4);
-}
+    background:#e6f7ee;
+    padding:12px;
+    border-left:5px solid #0a8754;
+    border-radius:6px;
+    color:#333;
+    font-size:14px;
+    margin-bottom:20px;
 
-
-button {
-    width: 100%;
-    padding: 10px;
-    background: #0a8754;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-button:hover {
-    background: #076b42;
 }
 
 
-nav {
-    text-align: center;
-    margin-top: 12px;
+label{
+
+    font-weight:bold;
 }
 
-nav a {
-    color: #0a8754;
-    text-decoration: none;
-    font-weight: bold;
+
+input{
+
+    width:100%;
+    padding:12px;
+    margin:8px 0 15px;
+    border:1px solid #ccc;
+    border-radius:6px;
+
 }
+
+
+input:focus{
+
+    outline:none;
+    border-color:#0a8754;
+
+}
+
+
+button{
+
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:6px;
+    background:#0a8754;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+
+}
+
+
+button:hover{
+
+    background:#076b42;
+
+}
+
+
+nav{
+
+    text-align:center;
+    margin-top:15px;
+
+}
+
+
+nav a{
+
+    color:#0a8754;
+    text-decoration:none;
+    font-weight:bold;
+
+}
+
 </style>
 
 </head>
 
+
 <body>
+
 
 <div id="popup"></div>
 
+
 <div class="container">
 
-<h2>Admin Login</h2>
+
+<h2>Staff Login</h2>
+
 
 <p class="info">
-Administrators and Waste Collectors can log in using their assigned username and password.
-Requestor /Residents should return to the Home page to submit waste collection requests.
+
+Administrators and Waste Collectors can login using their assigned username and password.
+
 </p>
 
-<form id="adminLoginForm">
 
-<label>Username</label> 
-<input id="adminUser" type="text" required>
+
+<form id="loginForm">
+
+
+<label>Username</label>
+
+<input 
+type="text" 
+id="username"
+required
+>
+
+
 
 <label>Password</label>
- <input id="adminPass" type="password" required>
 
-<button type="submit">Login </button>
+<input 
+type="password" 
+id="password"
+required
+>
+
+
+
+<button type="submit">
+Login
+</button>
+
 
 </form>
 
-<nav>
-<a href="index.html">Home</a>
 
+<nav>
+
+<a href="index.html">
+Home
+</a>
 
 </nav>
 
+
 </div>
+
+
+
 
 <script>
 
-function popup(msg){
-const p = document.getElementById("popup");
-p.innerText = msg;
-p.style.display = "block";
-setTimeout(()=> p.style.display="none", 2500);
+
+function popup(message){
+
+    const box=document.getElementById("popup");
+
+    box.innerText=message;
+
+    box.style.display="block";
+
+
+    setTimeout(()=>{
+
+        box.style.display="none";
+
+    },2500);
+
 }
 
-const form = document.getElementById("adminLoginForm");
-const adminUser = document.getElementById("adminUser");
-const adminPass = document.getElementById("adminPass");
 
-form.addEventListener("submit", async (e) => {
+
+
+const form=document.getElementById("loginForm");
+
+
+
+form.addEventListener("submit", async(e)=>{
+
+
 e.preventDefault();
 
-try {
 
-const res = await fetch("/api/login", {
-method: "POST",
-headers: {"Content-Type": "application/json"},
-body: JSON.stringify({
-username: adminUser.value.trim(),
-password: adminPass.value
-})
+
+const username=
+document.getElementById("username").value.trim();
+
+
+
+const password=
+document.getElementById("password").value;
+
+
+
+try{
+
+
+const response = await fetch("/api/login",{
+
+    method:"POST",
+
+    headers:{
+        "Content-Type":"application/json"
+    },
+
+    body:JSON.stringify({
+
+        username:username,
+
+        password:password
+
+    })
+
 });
 
-const data = await res.json();
 
-if (!res.ok) {
-popup(data.message || "Login failed");
-return;
+
+const data=await response.json();
+
+
+
+if(!response.ok){
+
+    popup(data.message || "Login failed");
+
+    return;
+
 }
+
+
+
+
+// Save complete user session
 
 sessionStorage.setItem(
     "loggedUser",
     JSON.stringify(data.user)
 );
 
+
 sessionStorage.setItem(
     "userRole",
     data.role
 );
 
+
+
+// Save collector identity
+
+if(data.role === "collector"){
+
+
+    sessionStorage.setItem(
+        "collector_name",
+        data.user.full_name
+    );
+
+
+    sessionStorage.setItem(
+        "collector_id",
+        data.user.id
+    );
+
+
+}
+
+
+
 popup("Login successful");
 
-setTimeout(() => {
 
-    if(data.role === "admin"){
 
-        window.location.href = "admin-Dashboard.html";
+setTimeout(()=>{
 
-    }else{
 
-        window.location.href = "collector-dashboard.html";
+if(data.role === "admin"){
 
-    }
 
-},1500);
+    window.location.href="admin-Dashboard.html";
 
-} catch (err) {
-popup("Server not reachable");
+
 }
+
+else if(data.role === "collector"){
+
+
+    window.location.href="collector-dashboard.html";
+
+
+}
+
+else{
+
+
+    popup("Unknown user role");
+
+
+}
+
+
+},1000);
+
+
+
+
+}catch(error){
+
+
+console.error(error);
+
+popup("Server not reachable");
+
+
+}
+
+
 
 });
 
+
+
 </script>
 
+
 </body>
+
 </html>
