@@ -1,81 +1,63 @@
-const nodemailer = require("nodemailer");
-
-// ======================================
-// EMAIL CONFIGURATION
-// ======================================
+const axios = require("axios");
 
 console.log("======================================");
-console.log("EMAIL MODULE LOADED");
-console.log("EMAIL_HOST :", process.env.EMAIL_HOST);
-console.log("EMAIL_PORT :", process.env.EMAIL_PORT);
-console.log("EMAIL_USER :", process.env.EMAIL_USER);
+console.log("BREVO EMAIL API LOADED");
 console.log(
-    "EMAIL_PASS :",
-    process.env.EMAIL_PASS ? "Loaded" : "Missing"
+    "BREVO_API_KEY:",
+    process.env.BREVO_API_KEY ? "Loaded" : "Missing"
 );
 console.log("======================================");
 
-// ======================================
-// CREATE SMTP TRANSPORTER
-// ======================================
-
-const transporter = nodemailer.createTransport({
-
-    host: process.env.EMAIL_HOST,
-
-    port: Number(process.env.EMAIL_PORT),
-
-    secure: false, // Port 587 uses STARTTLS
-
-    requireTLS: true,
-
-    auth: {
-
-        user: process.env.EMAIL_USER,
-
-        pass: process.env.EMAIL_PASS
-
-    },
-
-    connectionTimeout: 30000,
-
-    greetingTimeout: 30000,
-
-    socketTimeout: 30000,
-
-    tls: {
-        rejectUnauthorized: false
-    }
-
-});
-
-// ======================================
-// VERIFY SMTP CONNECTION
-// ======================================
-
-(async () => {
-
+async function sendEmail(to, subject, htmlContent) {
     try {
+        const response = await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "Mobile Waste Collection System - Rubaga",
+                    email: process.env.EMAIL_FROM || "afekurobert107@gmail.com"
+                },
 
-        await transporter.verify();
+                to: [
+                    {
+                        email: to
+                    }
+                ],
 
-        console.log("======================================");
-        console.log("SMTP CONNECTION READY");
-        console.log("======================================");
+                subject: subject,
+
+                htmlContent: htmlContent
+            },
+            {
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json",
+                    "api-key": process.env.BREVO_API_KEY
+                },
+                timeout: 30000
+            }
+        );
+
+        console.log("Email sent successfully");
+        console.log(response.data);
+
+        return true;
 
     } catch (err) {
 
-        console.log("======================================");
-        console.log("SMTP CONNECTION FAILED");
-        console.log(err);
-        console.log("======================================");
+        console.error("BREVO EMAIL FAILED");
 
+        if (err.response) {
+            console.error(err.response.status);
+            console.error(err.response.data);
+        } else {
+            console.error(err.message);
+        }
+
+        return false;
     }
+}
 
-})();
-
-// ======================================
-// EXPORT TRANSPORTER
-// ======================================
-
-module.exports = transporter;
+module.exports = {
+    sendEmail
+};
