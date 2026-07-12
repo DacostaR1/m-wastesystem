@@ -1,26 +1,26 @@
 const { sendEmail } = require("./email");
 
-/**
- * Send an email notification
- * @param {string} to - Recipient email address
- * @param {string} subject - Email subject
- * @param {string} message - HTML email content
- * @returns {Promise<boolean>}
- */
 async function sendNotification(to, subject, message) {
+
+    console.log("======================================");
+    console.log("sendNotification() CALLED");
+    console.log("TO:", to);
+    console.log("SUBJECT:", subject);
+    console.log("======================================");
+
     try {
+
         const sent = await sendEmail(to, subject, message);
 
-        if (sent) {
-            console.log(`Notification sent successfully to ${to}`);
-            return true;
-        }
+        console.log("sendEmail() returned:", sent);
 
-        console.log(`Failed to send notification to ${to}`);
-        return false;
+        return sent;
 
     } catch (error) {
-        console.error("Notification Error:", error.message);
+
+        console.error("Notification Error");
+        console.error(error);
+
         return false;
     }
 }
