@@ -285,7 +285,7 @@ err.message
 // SYSTEM LOGIN (ADMIN + COLLECTOR)
 
 
-st("/api/login", (req, res) => {
+app.post("/api/login", (req, res) => {
 
     const { username, password } = req.body;
 
